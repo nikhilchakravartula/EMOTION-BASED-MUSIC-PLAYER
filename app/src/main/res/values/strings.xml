@@ -11,11 +11,24 @@
     <string name="drawer_close">Drawer close</string>
     <string name="facebook_app_id">386473035072887</string>
     <string name="facebook_client_token">001ce422fab91fb5033b0a3bf56a2312</string>
+
+
+
     <string-array name="class_names">
-        <item>Class 1</item>
+        <item>LOGIN</item>
         <item>Class 2</item>
         <item>Class 3</item>
         <item>Class 4</item>
+
+    </string-array>
+
+
+    <string-array name="fully_qualified_class_names">
+        <item>com.example.emotionplayer.SOCIALPROFILE</item>
+        <item>Class 2</item>
+        <item>Class 3</item>
+        <item>Class 4</item>
+
     </string-array>
 
 

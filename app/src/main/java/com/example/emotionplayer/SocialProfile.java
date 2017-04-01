@@ -1,8 +1,14 @@
 package com.example.emotionplayer;
 
 import android.app.Activity;
+import android.app.Fragment;
+import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.pm.ActivityInfoCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
+import android.util.AttributeSet;
 import android.widget.Button;
 import android.view.*;
 import android.content.*;
@@ -20,32 +26,46 @@ import com.facebook.GraphResponse;
 import org.w3c.dom.Text;
 import com.facebook.HttpMethod;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.Arrays;
+import java.util.logging.Level;
 
-public class SocialProfile extends Activity {
+
+public class SocialProfile extends MusicPlayer {
 
     private String classes[] = {"Class1", "Class2", "Class3"};
     LoginButton fbButton;
     Button twitterButton;
     CallbackManager callbackmanager;
     TextView statusView;
+    View view;
+    android.app.Fragment fragment;
+    Fragment getFragment()
+    {
+        return fragment;
+    }
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        FacebookSdk.sdkInitialize(getApplicationContext());
-        setContentView(R.layout.activity_social_profile);
-        fbButton = (LoginButton) findViewById(R.id.fb_login_button);
+        // fragment=new SocialProfileFragment();
+       //view= fragment.getView();
+        LayoutInflater inflater=(LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        view=inflater.inflate(R.layout.activity_social_profile,null,false);
+        drawerLayout.addView(view,0);
+      getSupportActionBar().setTitle(getIntent().getStringExtra("position"));
+        fbButton=(LoginButton)view.findViewById(R.id.fb_login_button);
         fbButton.setReadPermissions(Arrays.asList("user_posts"));
-        twitterButton = (Button) findViewById(R.id.twitterButton);
-        statusView=(TextView)findViewById(R.id.login_status_view);
-    callbackmanager=(CallbackManager.Factory.create());
+       // twitterButton = (Button) view.findViewById(R.id.twitterButton);
+        //twitterButton.setEnabled(false);
+        statusView=(TextView)view.findViewById(R.id.login_status_view);
+        callbackmanager=(CallbackManager.Factory.create());
         fbButton.registerCallback(callbackmanager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
 
                 statusView.setText("Success"+loginResult.getAccessToken().getUserId()+"\n"+
-                                loginResult.getAccessToken().getToken());
+                        loginResult.getAccessToken().getToken());
                 getPosts();
 
             }
@@ -79,4 +99,7 @@ public class SocialProfile extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         callbackmanager.onActivityResult(requestCode, resultCode, data);
     }
+
+
+
 }
