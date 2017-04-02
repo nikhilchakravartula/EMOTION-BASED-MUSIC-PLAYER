@@ -44,6 +44,45 @@ class UtilityObject {
         return toneAnalyzer;
     }
 
+    private void syncAudio(){
+        String state = android.os.Environment.getExternalStorageState();
+        String externalStorageRoot = null;
+        if (android.os.Environment.MEDIA_MOUNTED.equals(state) ||
+                android.os.Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            externalStorageRoot = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+            syncAudioUtil(externalStorageRoot);
+        }
+        else{
+            // Raise Exception No Storage found
+        }
+    }
+
+    private void syncAudioUtil(String rootPath){
+        try{
+            File rootFolder = new File(rootPath);
+            File[] files = rootFolder.listFiles();
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    syncAudioUtil(file.getAbsolutePath());
+                } else{
+                    MediaMetadataRetriever fileMetadata = new MediaMetadataRetriever();
+                    fileMetadata.setDataSource(file.getAbsolutePath());
+                    if(fileMetadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO) != null
+                            && fileMetadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO) == null) {
+                        fileList.add(file.getAbsolutePath());
+                        saveSongTupleToDB(file.getAbsolutePath());
+                    }
+                }
+            }
+        }catch(Exception e){
+            return;
+        }
+    }
+
+    private void saveSongTupleToDB(String songPath){
+
+    }
+
 
 }
 public class Utility {
