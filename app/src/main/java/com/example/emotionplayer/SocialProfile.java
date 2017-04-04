@@ -2,6 +2,7 @@ package com.example.emotionplayer;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.pm.ActivityInfoCompat;
@@ -18,11 +19,15 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 import com.facebook.HttpMethod;
 import android.util.Log;
@@ -30,6 +35,8 @@ import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.logging.Level;
+
+import okhttp3.internal.Util;
 
 
 public class SocialProfile extends MusicPlayer {
@@ -39,6 +46,7 @@ public class SocialProfile extends MusicPlayer {
     Button twitterButton;
     CallbackManager callbackmanager;
     TextView statusView;
+    private String posts;
     View view;
     android.app.Fragment fragment;
     Fragment getFragment()
@@ -58,6 +66,11 @@ public class SocialProfile extends MusicPlayer {
         fbButton.setReadPermissions(Arrays.asList("user_posts"));
        // twitterButton = (Button) view.findViewById(R.id.twitterButton);
         //twitterButton.setEnabled(false);
+        if(isLogin())
+        {
+            System.out.println("Login already\n");
+            getPosts();
+        }
         statusView=(TextView)view.findViewById(R.id.login_status_view);
         callbackmanager=(CallbackManager.Factory.create());
         fbButton.registerCallback(callbackmanager, new FacebookCallback<LoginResult>() {
@@ -89,17 +102,41 @@ public class SocialProfile extends MusicPlayer {
                 AccessToken.getCurrentAccessToken(), "/me/posts", null, HttpMethod.GET,
                 new GraphRequest.Callback() {
                     public void onCompleted(GraphResponse response) {
-                        statusView.setText("Activity is" +response.toString());
+
+                        try {
+
+
+                            posts="";
+                            JSONObject object=response.getJSONObject();
+                            JSONArray arr=object.getJSONArray("data");
+                            for(int i=0;i<arr.length();i++)
+                            {
+                                if(arr.getJSONObject(i).has("message"))
+                                {
+                                    posts+=arr.getJSONObject(i).getString("message");
+                                }
+                            }
+                            statusView.setText("Result is "+posts);
+                           // System.out.println("value is" + object.get("graphObject").toString());
+                        }
+                        catch(Exception e)
+                        {
+                            statusView.setText("EXCEPTION"+ e.toString());
+                           // System.out.print("Excepton "+e.toString());
+                        }
                     }
                 }
         ).executeAsync();
     }
 
+    private boolean isLogin()
+    {
+        return AccessToken.getCurrentAccessToken() != null && Profile.getCurrentProfile()!=null;
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         callbackmanager.onActivityResult(requestCode, resultCode, data);
     }
 
-
-
 }
+

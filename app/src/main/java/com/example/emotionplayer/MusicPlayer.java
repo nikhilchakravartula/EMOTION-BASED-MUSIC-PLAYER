@@ -8,6 +8,7 @@ package com.example.emotionplayer;
 import android.content.Intent;
 
 import android.content.res.Configuration;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import android.os.PersistableBundle;
@@ -31,14 +32,18 @@ import android.widget.Toast;
 
 public class MusicPlayer extends AppCompatActivity implements OnItemClickListener{
 
-    //String classes[]={"Class1","Class2","Class3"};
+    //String classes[]={"Class1","Class2","Class3"}
     static public String PACKAGE_NAME;
     private ListView listView;
     protected DrawerLayout drawerLayout;
     protected String[] classes;
+    //UtilityObject utilityObject;
     private Toolbar toolbar;
     private String[] fullyQualifiedClassNames;
     private ActionBarDrawerToggle drawerListener;
+    Database database;
+    private SQLiteDatabase dbRead;
+    private SQLiteDatabase dbWrite;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,12 +58,16 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         listView.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,classes));
         listView.setOnItemClickListener(this);
 
+           // utilityObject=Utility.getUtilityObject();
+       // Toast.makeText(this,""+utilityObject,Toast.LENGTH_LONG);
         drawerListener=new ActionBarDrawerToggle(this,drawerLayout,R.string.drawer_open,R.string.drawer_close);
         drawerLayout.addDrawerListener(drawerListener);
 
         //toolbar=(Toolbar)findViewById(R.id.app_toolbar);
         //setSupportActionBar( (Toolbar)findViewById(R.id.app_toolbar));
-
+         database=new Database(getApplicationContext());
+        dbRead=database.getReadableDatabase();
+        dbWrite=database.getWritableDatabase();
 
 
     }
@@ -113,22 +122,27 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                         .replace(R.id.content_frame, socialProfile.getFragment())
                         .commit();*/
                 //Toast.makeText(this,"psotion is "+socialProfile.getFragment(),Toast.LENGTH_LONG).show();
-
+                System.out.print("fully qualified name "+ fullyQualifiedClassNames[position]);
                 Intent i=new Intent(fullyQualifiedClassNames[position]);
                 i.putExtra("position",classes[position]);
 
                 startActivity(i);
-
-
+                break;
+            case 1:
+                new ToneAnalyzerUtil().execute("");
+                Toast.makeText(this,"here finally",Toast.LENGTH_LONG);
+                new ToneAnalyzerUtil().execute("");
+                break;
         }
 
 
     }
 
-
-
-
-
+    @Override
+    protected void onDestroy() {
+        database.close();
+        super.onDestroy();
+    }
 }
 
 
