@@ -33,74 +33,46 @@ import okhttp3.internal.Util;
  * Created by nikhil on 01-04-2017.
  */
 
-class UtilityObject {
-    private MusixmatchUtil musixMatch;
-    private ToneAnalyzerUtil toneAnalyzer;
-    void setMusixMatchUtil(MusixmatchUtil o)
-    {
-        musixMatch=o;
-    }
-    void setToneAnalyzerUtil(ToneAnalyzerUtil o)
-    {
-        toneAnalyzer=o;
-    }
-    MusixmatchUtil getMusixMatchUtil()
-    {
-        return musixMatch;
-    }
-    ToneAnalyzerUtil getToneAnalyzerUtil()
-    {
-        return toneAnalyzer;
-    }
-    private void syncAudio(){
+
+
+class MediaOps{
+    private void syncAudio() {
         String state = android.os.Environment.getExternalStorageState();
         String externalStorageRoot = null;
         if (android.os.Environment.MEDIA_MOUNTED.equals(state) ||
                 android.os.Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
             externalStorageRoot = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
             syncAudioUtil(externalStorageRoot);
-        }
-        else{
+        } else {
             // Raise Exception No Storage found
         }
     }
-    private void syncAudioUtil(String rootPath){
-        try{
+
+
+    private void syncAudioUtil(String rootPath) {
+        try {
             File rootFolder = new File(rootPath);
             File[] files = rootFolder.listFiles();
             for (File file : files) {
                 if (file.isDirectory()) {
                     syncAudioUtil(file.getAbsolutePath());
-                } else{
+                } else {
                     MediaMetadataRetriever fileMetadata = new MediaMetadataRetriever();
                     fileMetadata.setDataSource(file.getAbsolutePath());
-                    if(fileMetadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO) != null
+                    if (fileMetadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO) != null
                             && fileMetadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO) == null) {
-                        fileList.add(file.getAbsolutePath());
+                      //  fileList.add(file.getAbsolutePath());
                         saveSongTupleToDB(file.getAbsolutePath());
                     }
                 }
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             return;
         }
     }
-    private void saveSongTupleToDB(String songPath){
-    }
-}
-public class Utility {
-    private static UtilityObject utilityObject=null;
-    private Utility()
-    {
-    }
-    public static UtilityObject getUtilityObject() {
-        if(utilityObject==null)
-        {
-            utilityObject=new UtilityObject();
-            utilityObject.setMusixMatchUtil(new MusixmatchUtil());
-            utilityObject.setToneAnalyzerUtil(new ToneAnalyzerUtil());
-        }
-        return utilityObject;
+
+
+    private void saveSongTupleToDB(String songPath) {
     }
 }
 
