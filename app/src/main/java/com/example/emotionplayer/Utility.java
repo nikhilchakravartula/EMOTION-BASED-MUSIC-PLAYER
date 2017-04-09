@@ -1,5 +1,6 @@
 package com.example.emotionplayer;
 import android.app.*;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -7,9 +8,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.ToneAnalyzer;
@@ -38,6 +42,8 @@ import okhttp3.internal.Util;
 
 
 class MediaOps{
+
+
     private void syncAudio(){
         String state = android.os.Environment.getExternalStorageState();
         String externalStorageRoot = null;
@@ -52,8 +58,8 @@ class MediaOps{
         }
     }
 
-    private void syncAudioMediaStore(){
-        ContentResolver cr = this.getContentResolver();
+    private void syncAudioMediaStore(Context context){
+        ContentResolver cr = context.getContentResolver();
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
         String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
@@ -77,8 +83,8 @@ class MediaOps{
     private void syncAudioUtil(String rootPath){
         try{
             String s = "";
-            TextView t1 = (TextView) findViewById(R.id.textView);
-            t1.setText(rootPath);
+            //TextView t1 = (TextView) findViewById(R.id.textView);
+            //t1.setText(rootPath);
             File rootFolder = new File(rootPath);
             File[] files = rootFolder.listFiles();
             for (File file : files) {

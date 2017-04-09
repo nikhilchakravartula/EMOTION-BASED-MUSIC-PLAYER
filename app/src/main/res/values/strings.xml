@@ -16,8 +16,8 @@
 
     <string-array name="class_names">
         <item>LOGIN</item>
-        <item>Class 2</item>
-        <item>Class 3</item>
+        <item>Tone analyzer</item>
+        <item>Synch Audio</item>
         <item>Class 4</item>
 
     </string-array>
@@ -25,7 +25,8 @@
 
     <string-array name="fully_qualified_class_names">
         <item>com.example.emotionplayer.SOCIALPROFILE</item>
-        <item>Class 2</item>
+        <item>dont touch</item>
+        <item>com.example.emotionplayer.SYNCHAUDIO</item>
         <item>Class 3</item>
         <item>Class 4</item>
 

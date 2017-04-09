@@ -133,6 +133,9 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                 Toast.makeText(this,"here finally",Toast.LENGTH_LONG);
                 new ToneAnalyzerUtil().execute("");
                 break;
+            case 2:
+                Intent i1 =new Intent(fullyQualifiedClassNames[position]);
+                startActivity(i1);
         }
 
 
