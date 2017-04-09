@@ -237,13 +237,13 @@ class Database extends SQLiteOpenHelper
 
 
     private final String  CREATE_SONG_TABLE= "CREATE TABLE " + Schemas.SongEmotionSchema.TABLE_NAME + " (" +
-            Schemas.SongEmotionSchema.ID + " INTEGER PRIMARY KEY," +
+            Schemas.SongEmotionSchema._ID + " INTEGER PRIMARY KEY," +
             Schemas.SongEmotionSchema.SONG_PATH + " TEXT," +
-            Schemas.SongEmotionSchema.ANGER + " TEXT," +
-            Schemas.SongEmotionSchema.DISGUST + " TEXT," +
-            Schemas.SongEmotionSchema.FEAR + " TEXT," +
-            Schemas.SongEmotionSchema.JOY + " TEXT," +
-            Schemas.SongEmotionSchema.SADNESS + " TEXT )";
+            Schemas.SongEmotionSchema.ANGER + " DOUBLE," +
+            Schemas.SongEmotionSchema.DISGUST + " DOUBLE," +
+            Schemas.SongEmotionSchema.FEAR + " DOUBLE," +
+            Schemas.SongEmotionSchema.JOY + " DOUBLE," +
+            Schemas.SongEmotionSchema.SADNESS + " DOUBLE )";
 
     public Database(Context context){
 
@@ -270,9 +270,10 @@ class SongTbHelper
     void putInfo(SQLiteDatabase dbWrite,String path,Double score[])
     {
 
+
         //for(int i=0;i<emotion.length;i++)
         ContentValues values = new ContentValues();
-        values.put(Schemas.SongEmotionSchema.ID,Schemas.SongEmotionSchema._ID);
+        values.put(Schemas.SongEmotionSchema.SONG_PATH,"'"+path+"'");
         values.put(Schemas.SongEmotionSchema.ANGER,score[0]);
         values.put(Schemas.SongEmotionSchema.DISGUST,score[1]);
         values.put(Schemas.SongEmotionSchema.FEAR,score[2]);
@@ -291,6 +292,7 @@ class SongTbHelper
     }
     void getInfo(SQLiteDatabase dbRead)
     {
+        System.out.print("READIG FROM DB");
         Cursor cursor=dbRead.query(Schemas.SongEmotionSchema.TABLE_NAME,
                 new String[]{Schemas.SongEmotionSchema.SONG_PATH,Schemas.SongEmotionSchema.ANGER},
                 null,null,null,null,null
@@ -300,9 +302,10 @@ class SongTbHelper
             cursor.moveToFirst();
         while(cursor!=null && cursor.moveToNext())
         {
-            System.out.println("value is "+cursor.getColumnIndexOrThrow(Schemas.SongEmotionSchema.SONG_PATH));
+            System.out.println("value is "+cursor.getString(cursor.getColumnIndexOrThrow(Schemas.SongEmotionSchema.SONG_PATH)));
 
         }
+        System.out.print("READ DONE\n");
     }
 
 

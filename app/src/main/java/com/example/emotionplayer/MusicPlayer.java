@@ -66,8 +66,8 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         //toolbar=(Toolbar)findViewById(R.id.app_toolbar);
         //setSupportActionBar( (Toolbar)findViewById(R.id.app_toolbar));
          database=new Database(getApplicationContext());
-        dbRead=database.getReadableDatabase();
-        dbWrite=database.getWritableDatabase();
+       // dbWrite=database.getWritableDatabase();
+        //dbRead=database.getReadableDatabase();
 
 
     }
@@ -136,6 +136,11 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
             case 2:
                 Intent i1 =new Intent(fullyQualifiedClassNames[position]);
                 startActivity(i1);
+                break;
+            case 3:
+                new SongTbHelper().putInfo(database.getWritableDatabase(),"hi this is path",new Double[]{0.2,0.3,0.2,0.1,0.5});
+                new SongTbHelper().getInfo(database.getReadableDatabase());
+                break;
         }
 
 
