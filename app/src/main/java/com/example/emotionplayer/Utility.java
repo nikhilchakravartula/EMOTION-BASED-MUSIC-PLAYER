@@ -3,6 +3,7 @@ import android.app.*;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.media.MediaMetadataRetriever;
@@ -26,6 +27,7 @@ import org.jmusixmatch.entity.track.TrackData;
 
 import java.io.File;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import okhttp3.internal.Util;
 
@@ -211,17 +213,13 @@ final class Schemas
     {
 
         public static final String TABLE_NAME = "song_emotion_table";
-        public static final String SONG_PATH = "title";
-        public static final String SONG_ANGER_SCORE = "subtitle";
-        public static final String SONG_ = "entry";
-        public static final String COLUMN_NAME_TITLE = "title";
-        public static final String COLUMN_NAME_SUBTITLE = "subtitle";
-    }
-    public class GenreSchema implements  BaseColumns
-    {
-        public  static final String TABLE_NAME="genre_table";
-        public static final String GENRE="genre";
-        public  static final String MOOD="mood";
+        public  static  final String ID="_id";
+        public static final String SONG_PATH = "path";
+        public static final String ANGER = "anger";
+        public static final String DISGUST = "disgust";
+        public static final String FEAR = "fear";
+        public static final String JOY = "joy";
+        public  static  final String SADNESS="sadness";
     }
 }
 
@@ -232,11 +230,14 @@ class Database extends SQLiteOpenHelper
 
 
 
-    private final String  CREATE_GENRE_TABLE= "CREATE TABLE " + Schemas.GenreSchema.TABLE_NAME + " (" +
-            Schemas.GenreSchema._ID + " INTEGER PRIMARY KEY," +
-            Schemas.GenreSchema.GENRE + " TEXT," +
-            Schemas.GenreSchema.MOOD + " TEXT)";
-    private final String  CREATE_SCHEMA_TABLE="";
+    private final String  CREATE_SONG_TABLE= "CREATE TABLE " + Schemas.SongEmotionSchema.TABLE_NAME + " (" +
+            Schemas.SongEmotionSchema.ID + " INTEGER PRIMARY KEY," +
+            Schemas.SongEmotionSchema.SONG_PATH + " TEXT," +
+            Schemas.SongEmotionSchema.ANGER + " TEXT," +
+            Schemas.SongEmotionSchema.DISGUST + " TEXT," +
+            Schemas.SongEmotionSchema.FEAR + " TEXT," +
+            Schemas.SongEmotionSchema.JOY + " TEXT," +
+            Schemas.SongEmotionSchema.SADNESS + " TEXT )";
 
     public Database(Context context){
 
@@ -244,8 +245,7 @@ class Database extends SQLiteOpenHelper
         }
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_GENRE_TABLE);
-        db.execSQL(CREATE_SCHEMA_TABLE);
+        db.execSQL(CREATE_SONG_TABLE);
     }
 
     @Override
@@ -261,13 +261,19 @@ class Database extends SQLiteOpenHelper
 
 class SongTbHelper
 {
-    void putInfo(SQLiteDatabase dbWrite,String path,String[] emotion,Double score[])
+    void putInfo(SQLiteDatabase dbWrite,String path,Double score[])
     {
 
         //for(int i=0;i<emotion.length;i++)
         ContentValues values = new ContentValues();
-        values.put(Schemas.SongEmotionSchema.COLUMN_NAME_TITLE, emotion[0]);
-        values.put(Schemas.SongEmotionSchema.COLUMN_NAME_SUBTITLE, score[0]);
+        values.put(Schemas.SongEmotionSchema.ID,Schemas.SongEmotionSchema._ID);
+        values.put(Schemas.SongEmotionSchema.ANGER,score[0]);
+        values.put(Schemas.SongEmotionSchema.DISGUST,score[1]);
+        values.put(Schemas.SongEmotionSchema.FEAR,score[2]);
+        values.put(Schemas.SongEmotionSchema.JOY,score[3]);
+        values.put(Schemas.SongEmotionSchema.SADNESS,score[4]);
+
+
 
 
         long newRowId =dbWrite.insert(Schemas.SongEmotionSchema.TABLE_NAME,null,values);
@@ -277,7 +283,21 @@ class SongTbHelper
     {
         dbWrite.delete(Schemas.SongEmotionSchema.TABLE_NAME,"WHERE COLUMN_NAME "+"LIKE ?",new String[]{"VALUEFORCOLUMN"});
     }
+    void getInfo(SQLiteDatabase dbRead)
+    {
+        Cursor cursor=dbRead.query(Schemas.SongEmotionSchema.TABLE_NAME,
+                new String[]{Schemas.SongEmotionSchema.SONG_PATH,Schemas.SongEmotionSchema.ANGER},
+                null,null,null,null,null
 
+                );
+        if(cursor!=null)
+            cursor.moveToFirst();
+        while(cursor!=null && cursor.moveToNext())
+        {
+            System.out.println("value is "+cursor.getColumnIndexOrThrow(Schemas.SongEmotionSchema.SONG_PATH));
+
+        }
+    }
 
 
 }
