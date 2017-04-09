@@ -41,12 +41,12 @@ import okhttp3.internal.Util;
 
 public class SocialProfile extends MusicPlayer {
 
-    private String classes[] = {"Class1", "Class2", "Class3"};
+
     LoginButton fbButton;
     Button twitterButton;
     CallbackManager callbackmanager;
     TextView statusView;
-    private String posts;
+    private static String posts;
     View view;
     android.app.Fragment fragment;
     Fragment getFragment()
@@ -97,12 +97,12 @@ public class SocialProfile extends MusicPlayer {
 
     }
 
-    private void getPosts(){
+    public static String getPosts(){
         new GraphRequest(
                 AccessToken.getCurrentAccessToken(), "/me/posts", null, HttpMethod.GET,
                 new GraphRequest.Callback() {
                     public void onCompleted(GraphResponse response) {
-
+                        posts="";
                         try {
 
 
@@ -114,22 +114,28 @@ public class SocialProfile extends MusicPlayer {
                                 if(arr.getJSONObject(i).has("message"))
                                 {
                                     posts+=arr.getJSONObject(i).getString("message");
+                                    posts+=".";
                                 }
                             }
-                            statusView.setText("Result is "+posts);
+
+
+                            //statusView.setText("Result is "+posts);
                            // System.out.println("value is" + object.get("graphObject").toString());
+
                         }
                         catch(Exception e)
                         {
-                            statusView.setText("EXCEPTION"+ e.toString());
+                        //    statusView.setText("EXCEPTION"+ e.toString());
                            // System.out.print("Excepton "+e.toString());
+
                         }
                     }
                 }
         ).executeAsync();
+    return posts;
     }
 
-    private boolean isLogin()
+    public static boolean isLogin()
     {
         return AccessToken.getCurrentAccessToken() != null && Profile.getCurrentProfile()!=null;
     }

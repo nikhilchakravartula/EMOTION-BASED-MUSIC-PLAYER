@@ -29,6 +29,8 @@ import android.app.*;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 
 public class MusicPlayer extends AppCompatActivity implements OnItemClickListener{
 
@@ -44,6 +46,8 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
     Database database;
     private SQLiteDatabase dbRead;
     private SQLiteDatabase dbWrite;
+    public static ArrayList<Emotion> emotion;
+    private String posts;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,10 +72,26 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
          database=new Database(getApplicationContext());
        // dbWrite=database.getWritableDatabase();
         //dbRead=database.getReadableDatabase();
-
-
+        synchFb();
     }
 
+    private void synchFb()
+    {
+        if(SocialProfile.isLogin())
+        {
+            Toast.makeText(getApplicationContext(),"FB integration successful",Toast.LENGTH_LONG);
+            posts=SocialProfile.getPosts();
+            emotion=new ArrayList<Emotion>(5);
+            new ToneAnalyzerUtil().execute(posts);
+            System.out.print(emotion.get(0).emotion+"\t"+emotion.get(0).score+"\n");
+        }
+        else
+        {
+            System.out.print("FB login fail");
+            Toast.makeText(getApplicationContext(),"Cannot integragte FB.Please Login",Toast.LENGTH_LONG);
+        }
+
+    }
     @Override
     protected void onStart() {
         super.onStart();
@@ -125,17 +145,20 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                 System.out.print("fully qualified name "+ fullyQualifiedClassNames[position]);
                 Intent i=new Intent(fullyQualifiedClassNames[position]);
                 i.putExtra("position",classes[position]);
-
                 startActivity(i);
                 break;
+
             case 1:
                 new ToneAnalyzerUtil().execute("");
                 Toast.makeText(this,"here finally",Toast.LENGTH_LONG);
                 new ToneAnalyzerUtil().execute("");
                 break;
+
             case 2:
                 Intent i1 =new Intent(fullyQualifiedClassNames[position]);
+                i1.putExtra("position",classes[position]);
                 startActivity(i1);
+
                 break;
             case 3:
                 new SongTbHelper().putInfo(database.getWritableDatabase(),"hi this is path",new Double[]{0.2,0.3,0.2,0.1,0.5});

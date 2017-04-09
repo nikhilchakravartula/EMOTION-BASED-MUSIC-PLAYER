@@ -15,7 +15,7 @@
 
 
     <string-array name="class_names">
-        <item>LOGIN</item>
+        <item>Social Profile</item>
         <item>Tone analyzer</item>
         <item>Synch Audio</item>
         <item>Db example</item>
