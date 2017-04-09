@@ -42,6 +42,7 @@ class MediaOps{
         if (android.os.Environment.MEDIA_MOUNTED.equals(state) ||
                 android.os.Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
             externalStorageRoot = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+            syncAudioUtil(externalStorageRoot);
             syncAudioUtil("/storage/sdcard1/");
         }
         else{
