@@ -128,18 +128,16 @@ class Emotion
 }
 
 
- class ToneAnalyzerUtil extends AsyncTask<String, Integer, String> {
+class ToneAnalyzerUtil extends AsyncTask<String, Integer, String>{
     private String toneDisplay = "";
-     private String username="436bee8d-8736-459d-941f-fa6b441a4604";
-     private String password="kmtdptoC25d7";
+    private String path = "";
     @Override
     protected String doInBackground(String... params) {
         ToneAnalyzer service = new ToneAnalyzer(ToneAnalyzer.VERSION_DATE_2016_05_19);
-        service.setUsernameAndPassword(username, password);
-
-        String text =params[0];
-
-// Call the service and get the tone
+        service.setUsernameAndPassword("436bee8d-8736-459d-941f-fa6b441a4604", "kmtdptoC25d7");
+        String text = params[0];
+        path = params[1];
+    // Call the service and get the tone
         ToneAnalysis tone = service.getTone(text, null).execute();
         ElementTone etone = tone.getDocumentTone();
         List toneCategories = etone.getTones();
@@ -153,10 +151,6 @@ class Emotion
 
         for(Object tstemp: tones){
             ToneScore ts = (ToneScore)tstemp;
-            Emotion e=new Emotion();
-            e.emotion=ts.getName();
-            e.score=(ts.getScore());
-            MusicPlayer.emotion.add(e);
             toneDisplay += ts.getName() + ": " + String.valueOf(ts.getScore()) + "\n";
         }
         return null;
@@ -164,42 +158,46 @@ class Emotion
 
     @Override
     protected void onPostExecute(String result) {
-
-        System.out.println("result is"+toneDisplay);
-
-
+            // Insert to DB
     }
 }
 
-
- class MusixmatchUtil extends AsyncTask<String, Integer, String>{
+class MusixmatchUtil extends AsyncTask<String, Integer, String>{
     private String lyricDisplay = "";
-     private String apiKey = "ad3f1bae155e113eed3805157baa45d2";
-     private String trackName = "Heavy";
-    private String artist = "Linkin Park";
+    private String path = "";
     @Override
     protected String doInBackground(String... params) {
-
+        String apiKey = "ad3f1bae155e113eed3805157baa45d2";
         MusixMatch musixMatch = new MusixMatch(apiKey);
-
-        Track track = null;
-        try {
-            track = musixMatch.getMatchingTrack(trackName, artist);
-            TrackData data = track.getTrack();
-            int trackId = data.getTrackId();
-            Lyrics lyrics = musixMatch.getLyrics(trackId);
-            lyricDisplay = lyrics.getLyricsBody();
-        } catch (MusixMatchException e) {
-            lyricDisplay = "Oops!";
+        path = params[0];
+        MediaMetadataRetriever metadata = new MediaMetadataRetriever();
+        metadata.setDataSource(path);
+        String trackName = metadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        String artist = metadata.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+        //trackName = "Heavy";
+        //artist = "Linkin park";
+        if(trackName!=null && artist != null) {
+            Track track = null;
+            try {
+                track = musixMatch.getMatchingTrack(trackName, artist);
+                TrackData data = track.getTrack();
+                int trackId = data.getTrackId();
+                Lyrics lyrics = musixMatch.getLyrics(trackId);
+                lyricDisplay = lyrics.getLyricsBody();
+            } catch (MusixMatchException e) {
+                lyricDisplay = "";
+            }
         }
         return null;
     }
 
     @Override
     protected void onPostExecute(String result) {
-        Intent i=new Intent("com.example.emotionplayer.RANDOM");
-        i.putExtra("tone_detail",lyricDisplay);
- //       startActivity(i);
+        //TextView text1 = (TextView) findViewById(R.id.textView);
+        //text1.setText(lyricDisplay);
+        if(lyricDisplay != ""){
+            new ToneAnalyzerUtil().execute(lyricDisplay, path);
+        }
     }
 }
 
