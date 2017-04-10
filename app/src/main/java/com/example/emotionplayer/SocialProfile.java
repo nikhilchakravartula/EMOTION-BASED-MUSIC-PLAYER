@@ -77,9 +77,8 @@ public class SocialProfile extends MusicPlayer {
             @Override
             public void onSuccess(LoginResult loginResult) {
 
-                statusView.setText("Success"+loginResult.getAccessToken().getUserId()+"\n"+
-                        loginResult.getAccessToken().getToken());
-                getPosts();
+                statusView.setText("Success");
+                MusicPlayer.login=true;
 
             }
 
@@ -90,14 +89,14 @@ public class SocialProfile extends MusicPlayer {
 
             @Override
             public void onError(FacebookException error) {
-                statusView.setText("Error occured"+error.toString());
+                statusView.setText("Error occured "+error.toString());
             }
         });
 
 
     }
 
-    public static String getPosts(){
+    public static void getPosts(){
         new GraphRequest(
                 AccessToken.getCurrentAccessToken(), "/me/posts", null, HttpMethod.GET,
                 new GraphRequest.Callback() {
@@ -117,22 +116,22 @@ public class SocialProfile extends MusicPlayer {
                                     posts+=".";
                                 }
                             }
-
-
+                            System.out.print("getting tone of fb posts "+posts);
+                            new ToneAnalyzerUtil().execute(posts);
                             //statusView.setText("Result is "+posts);
                            // System.out.println("value is" + object.get("graphObject").toString());
 
                         }
                         catch(Exception e)
                         {
-                        //    statusView.setText("EXCEPTION"+ e.toString());
-                           // System.out.print("Excepton "+e.toString());
+                           // statusView.setText("EXCEPTION"+ e.toString());
+                            System.out.print("Excepton "+e.toString());
 
                         }
                     }
                 }
         ).executeAsync();
-    return posts;
+
     }
 
     public static boolean isLogin()

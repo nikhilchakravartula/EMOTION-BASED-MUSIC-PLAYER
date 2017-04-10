@@ -19,4 +19,15 @@
         android:dividerHeight="0dp"
         android:background="#FFFFFF"
         />
+
+
+    <ProgressBar
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        style="@android:style/Widget.ProgressBar.Small"
+        android:layout_marginRight="5dp"
+        android:id="@+id/progress_bar"
+        android:progressDrawable="@drawable/circular_progress_bar"
+        />
+
 </android.support.v4.widget.DrawerLayout>

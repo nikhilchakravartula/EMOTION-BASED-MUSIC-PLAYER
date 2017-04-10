@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -136,8 +137,9 @@ class Emotion
     protected String doInBackground(String... params) {
         ToneAnalyzer service = new ToneAnalyzer(ToneAnalyzer.VERSION_DATE_2016_05_19);
         service.setUsernameAndPassword(username, password);
-
+        System.out.print("in tone analyzer");
         String text =params[0];
+        System.out.print("text is "+text);
 
 // Call the service and get the tone
         ToneAnalysis tone = service.getTone(text, null).execute();
@@ -156,7 +158,7 @@ class Emotion
             Emotion e=new Emotion();
             e.emotion=ts.getName();
             e.score=(ts.getScore());
-            MusicPlayer.emotion.add(e);
+            //MusicPlayer.emotion.add(e);
             toneDisplay += ts.getName() + ": " + String.valueOf(ts.getScore()) + "\n";
         }
         return null;
@@ -165,6 +167,9 @@ class Emotion
     @Override
     protected void onPostExecute(String result) {
 
+        MusicPlayer.progressBar.setVisibility(View.GONE);
+        MusicPlayer.listView.setVisibility(View.VISIBLE);
+        MusicPlayer.setActionBar();
         System.out.println("result is"+toneDisplay);
 
 
