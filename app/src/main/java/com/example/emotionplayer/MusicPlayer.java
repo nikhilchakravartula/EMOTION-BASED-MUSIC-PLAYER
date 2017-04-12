@@ -65,11 +65,11 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         fullyQualifiedClassNames=getResources().getStringArray(R.array.fully_qualified_class_names);
         drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
         progressBar=(ProgressBar)findViewById(R.id.progress_bar);
-        progressBar.setVisibility(View.VISIBLE);
+        //progressBar.setVisibility(View.VISIBLE);
         listView=(ListView)findViewById(R.id.core_options);
         listView.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,classes));
         listView.setOnItemClickListener(this);
-        listView.setVisibility(View.GONE);
+        //listView.setVisibility(View.GONE);
         // utilityObject=Utility.getUtilityObject();
         // Toast.makeText(this,""+utilityObject,Toast.LENGTH_LONG);
         drawerListener=new ActionBarDrawerToggle(this,drawerLayout,R.string.drawer_open,R.string.drawer_close);
@@ -94,21 +94,27 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
             //Toast.makeText(this,"pOSTS DONE",Toast.LENGTH_LONG);
             //System.out.print(emotion.get(0).emotion+"\t"+emotion.get(0).score+"\n");
         }
+        else
+        {
+           // progressBar.setVisibility(View.GONE);
+          //  listView.setVisibility(View.VISIBLE);
+            setActionBar();
+        }
 
     }
     @Override
     protected void onStart() {
         super.onStart();
         actionBar=getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(R.drawable.three_lines);
+
 
     }
 
     public static void setActionBar()
     {
-
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeAsUpIndicator(R.drawable.three_lines);
 
     }
 
@@ -151,7 +157,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         Toast.makeText(this,"psotion is "+position + "and name is"+classes[position],Toast.LENGTH_LONG).show();
-
+        System.out.print("item click");
         if(login==false)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -183,7 +189,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                         .commit();*/
                 //Toast.makeText(this,"psotion is "+socialProfile.getFragment(),Toast.LENGTH_LONG).show();
                loginFb(position);
-                synchFb();
+         //       synchFb();
                 break;
 
             case 1:

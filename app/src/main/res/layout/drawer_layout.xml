@@ -7,8 +7,17 @@
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-    <!-- The navigation drawer -->
+        android:layout_height="match_parent"
+>
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:minHeight="20dip"
+        android:maxHeight="20dip"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        style="@android:style/Widget.Holo.Light.ProgressBar.Small"/>
+
+    </FrameLayout>
     <ListView android:id="@+id/core_options"
         android:layout_width="240dp"
         android:entries="@array/class_names"
@@ -18,16 +27,6 @@
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
         android:background="#FFFFFF"
-        />
-
-
-    <ProgressBar
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        style="@android:style/Widget.ProgressBar.Small"
-        android:layout_marginRight="5dp"
-        android:id="@+id/progress_bar"
-        android:progressDrawable="@drawable/circular_progress_bar"
         />
 
 </android.support.v4.widget.DrawerLayout>

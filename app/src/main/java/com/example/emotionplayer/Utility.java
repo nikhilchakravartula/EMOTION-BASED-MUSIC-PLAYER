@@ -43,13 +43,6 @@ import okhttp3.internal.Util;
 
 
 
-class MediaOps{
-
-
-   }
-
-
-
 
 
 class Emotion
@@ -64,12 +57,13 @@ class ToneAnalyzerUtil extends AsyncTask<String, Integer, String>{
     private String path = "";
     @Override
     protected String doInBackground(String... params) {
+        publishProgress(0);
         ToneAnalyzer service = new ToneAnalyzer(ToneAnalyzer.VERSION_DATE_2016_05_19);
         service.setUsernameAndPassword("436bee8d-8736-459d-941f-fa6b441a4604", "kmtdptoC25d7");
         String text = params[0];
-        path = params[1];
+        //path = params[1];
     // Call the service and get the tone
-
+        publishProgress(50);
         ToneAnalysis tone = service.getTone(text, null).execute();
         ElementTone etone = tone.getDocumentTone();
         List toneCategories = etone.getTones();
@@ -95,13 +89,20 @@ class ToneAnalyzerUtil extends AsyncTask<String, Integer, String>{
     @Override
     protected void onPostExecute(String result) {
 
-        MusicPlayer.progressBar.setVisibility(View.GONE);
-        MusicPlayer.listView.setVisibility(View.VISIBLE);
+        //MusicPlayer.progressBar.setVisibility(View.GONE);
+       // MusicPlayer.listView.setVisibility(View.VISIBLE);
+
         MusicPlayer.setActionBar();
         System.out.println("result is"+toneDisplay);
+        MusicPlayer.progressBar.setVisibility(View.GONE);
 
             // Insert to DB
 
+    }
+
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        MusicPlayer.progressBar.setProgress(values[0]);
     }
 }
 
