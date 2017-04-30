@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Path;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import android.os.AsyncTask;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.v4.view.NestedScrollingParentHelper;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import javax.xml.validation.Schema;
+
 import okhttp3.internal.Util;
 
 /**
@@ -48,7 +52,11 @@ import okhttp3.internal.Util;
 
 
 
-
+class PathEmotion
+{
+    String path;
+    ArrayList<Double> scores;
+}
 
 class ToneAnalyzerUtil extends AsyncTask<String, Integer, String>{
     private String toneDisplay = "";
@@ -242,27 +250,42 @@ class SongTbHelper
     {
         dbWrite.delete(Schemas.SongEmotionSchema.TABLE_NAME,"WHERE COLUMN_NAME "+"LIKE ?",new String[]{"VALUEFORCOLUMN"});
     }
-    ArrayList<String> getInfo(SQLiteDatabase dbRead)
+    ArrayList<PathEmotion> getInfo(SQLiteDatabase dbRead)
     {
-        ArrayList<String> paths=new ArrayList<String>();
+
+        ArrayList<PathEmotion> pathsEmotions=new ArrayList<PathEmotion>();
         System.out.print("READIG FROM DB");
         Cursor cursor=dbRead.query(Schemas.SongEmotionSchema.TABLE_NAME,
-                new String[]{Schemas.SongEmotionSchema.SONG_PATH,Schemas.SongEmotionSchema.ANGER},
+                new String[]{Schemas.SongEmotionSchema.SONG_PATH,Schemas.SongEmotionSchema.ANGER,
+                Schemas.SongEmotionSchema.DISGUST,
+                        Schemas.SongEmotionSchema.FEAR,
+                        Schemas.SongEmotionSchema.JOY,
+                        Schemas.SongEmotionSchema.SADNESS
+                },
                 null,null,null,null,null
 
                 );
+        int i=0;
         if(cursor!=null)
             cursor.moveToFirst();
         while(cursor!=null && cursor.moveToNext())
         {
             String path=cursor.getString(cursor.getColumnIndexOrThrow(Schemas.SongEmotionSchema.SONG_PATH));
+            PathEmotion pe=new PathEmotion();
+            pe.path=path.substring(1,path.length()-1);
+            pe.scores=new ArrayList<Double>();
+                pe.scores.add(cursor.getDouble(cursor.getColumnIndexOrThrow(Schemas.SongEmotionSchema.ANGER)));
+                pe.scores.add(cursor.getDouble(cursor.getColumnIndexOrThrow(Schemas.SongEmotionSchema.DISGUST)));
+                pe.scores.add(cursor.getDouble(cursor.getColumnIndexOrThrow(Schemas.SongEmotionSchema.FEAR)));
+                pe.scores.add(cursor.getDouble(cursor.getColumnIndexOrThrow(Schemas.SongEmotionSchema.JOY)));
+                pe.scores.add(cursor.getDouble(cursor.getColumnIndexOrThrow(Schemas.SongEmotionSchema.SADNESS)));
 
-            paths.add(path.substring(1,path.length()-1));
+            pathsEmotions.add(pe);
 
 
         }
         System.out.print("READ DONE\n");
-        return paths;
+        return pathsEmotions;
     }
 
 
