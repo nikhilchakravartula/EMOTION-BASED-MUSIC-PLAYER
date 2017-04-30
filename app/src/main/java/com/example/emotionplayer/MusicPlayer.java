@@ -10,6 +10,9 @@ import android.content.Intent;
 
 import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 
 import android.os.PersistableBundle;
@@ -30,11 +33,18 @@ import android.widget.ArrayAdapter;
 import android.app.*;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 
 
+class Emotion
+{
+    ArrayList<String> emotions;
+    ArrayList<Double> scores;
+}
 public class MusicPlayer extends AppCompatActivity implements OnItemClickListener{
 
     //String classes[]={"Class1","Class2","Class3"}
@@ -47,16 +57,21 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
     private Toolbar toolbar;
     private String[] fullyQualifiedClassNames;
     private ActionBarDrawerToggle drawerListener;
-    Database database;
+    static Database database;
     private SQLiteDatabase dbRead;
     private SQLiteDatabase dbWrite;
-    public static ArrayList<Emotion> emotion;
     private String posts;
     public  static ProgressBar progressBar;
+    public static TextView start_load_message;
+    public static Emotion emotion;
+
     public static android.support.v7.app.ActionBar actionBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        emotion=new Emotion();
+        emotion.emotions=new ArrayList<String>(5);
+        emotion.scores=new ArrayList<Double>(5);
         PACKAGE_NAME=getApplicationContext().getPackageName();
         //	setListAdapter(new ArrayAdapter<String>(MusicPlayer.this,android.R.layout.simple_list_item_1,classes));
         //	setListAdapter(new ArrayAdapter<String>(MusicPlayer.this,android.R.layout.simple_list_item_1, Arrays.asList(getResources().getStringArray(R.array.class_names))));
@@ -66,6 +81,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
         progressBar=(ProgressBar)findViewById(R.id.progress_bar);
         //progressBar.setVisibility(View.VISIBLE);
+        start_load_message=(TextView)findViewById(R.id.start_load_message);
         listView=(ListView)findViewById(R.id.core_options);
         listView.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,classes));
         listView.setOnItemClickListener(this);
@@ -80,7 +96,14 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         database=new Database(getApplicationContext());
         // dbWrite=database.getWritableDatabase();
         //dbRead=database.getReadableDatabase();
+
+
         synchFb();
+
+       /*setActionBar();
+        progressBar.setVisibility(View.GONE);
+        start_load_message.setVisibility(View.GONE);
+        login=true;*/
     }
 
     private void synchFb()
@@ -98,6 +121,8 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         {
            // progressBar.setVisibility(View.GONE);
           //  listView.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+            start_load_message.setVisibility(View.GONE);
             setActionBar();
         }
 
@@ -193,9 +218,9 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                 break;
 
             case 1:
-                new ToneAnalyzerUtil().execute("");
+                //new ToneAnalyzerUtil().execute("");
                 Toast.makeText(this,"here finally",Toast.LENGTH_LONG);
-                new ToneAnalyzerUtil().execute("");
+                //new ToneAnalyzerUtil().execute("");
                 break;
 
             case 2:
@@ -205,8 +230,21 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
 
                 break;
             case 3:
-                new SongTbHelper().putInfo(database.getWritableDatabase(),"hi this is path",new Double[]{0.2,0.3,0.2,0.1,0.5});
-                new SongTbHelper().getInfo(database.getReadableDatabase());
+                //new SongTbHelper().putInfo(database.getWritableDatabase(),"hi this is path",new ArrayList<Double>());
+                ArrayList<String> paths=new SongTbHelper().getInfo(database.getReadableDatabase());
+                MediaPlayer player=new MediaPlayer();
+                player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                try {
+                    System.out.println("path is "+ paths.get(0));
+                    player.setDataSource(new FileInputStream(paths.get(0)).getFD());
+                    player.prepare();
+                    player.start();
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                    System.out.println("Exception occured "+ e.getStackTrace());
+                }
                 break;
         }
 

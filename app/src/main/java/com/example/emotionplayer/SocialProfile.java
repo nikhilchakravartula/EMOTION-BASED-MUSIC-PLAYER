@@ -79,6 +79,9 @@ public class SocialProfile extends MusicPlayer {
 
                 statusView.setText("Success");
                 MusicPlayer.login=true;
+                MusicPlayer.progressBar.setVisibility(View.VISIBLE);
+                start_load_message.setVisibility(View.VISIBLE);
+                getPosts();
 
             }
 
@@ -117,7 +120,7 @@ public class SocialProfile extends MusicPlayer {
                                 }
                             }
                             System.out.print("getting tone of fb posts "+posts);
-                            new ToneAnalyzerUtil().execute(posts);
+                            new ToneAnalyzerUtil().execute("FBPOSTS",posts);
                             //statusView.setText("Result is "+posts);
                            // System.out.println("value is" + object.get("graphObject").toString());
 
@@ -125,6 +128,7 @@ public class SocialProfile extends MusicPlayer {
                         catch(Exception e)
                         {
                            // statusView.setText("EXCEPTION"+ e.toString());
+                            MusicPlayer.progressBar.setVisibility(View.GONE);
                             System.out.print("Excepton "+e.toString());
 
                         }

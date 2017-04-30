@@ -11,6 +11,8 @@
     <string name="drawer_close">Drawer close</string>
     <string name="facebook_app_id">386473035072887</string>
     <string name="facebook_client_token">001ce422fab91fb5033b0a3bf56a2312</string>
+    <string name="loading_fb_posts">Loading components</string>
+    <string name="add_song_message">Adding song(s)</string>
 
 
 

@@ -4,10 +4,12 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.BaseColumns;
@@ -31,6 +33,7 @@ import org.jmusixmatch.entity.track.Track;
 import org.jmusixmatch.entity.track.TrackData;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -45,25 +48,30 @@ import okhttp3.internal.Util;
 
 
 
-class Emotion
-{
-    String emotion;
-    Double score;
-}
 
 
 class ToneAnalyzerUtil extends AsyncTask<String, Integer, String>{
     private String toneDisplay = "";
     private String path = "";
+    private boolean isFb=false;
+    private ArrayList<Double> emotion;
     @Override
     protected String doInBackground(String... params) {
         publishProgress(0);
         ToneAnalyzer service = new ToneAnalyzer(ToneAnalyzer.VERSION_DATE_2016_05_19);
-        service.setUsernameAndPassword("436bee8d-8736-459d-941f-fa6b441a4604", "kmtdptoC25d7");
-        String text = params[0];
+        service.setUsernameAndPassword("9ccb6843-18c1-4cc8-b884-f24770f567ff", "6MS7RwKEnPPw");
+        if(params[0].equalsIgnoreCase("FBPOSTS"))
+        {
+            isFb=true;
+        }
+        else if(params[0].equalsIgnoreCase("SONGS"))
+        {
+            path=params[2];
+
+        }
+        String text = params[1];
         //path = params[1];
     // Call the service and get the tone
-        publishProgress(50);
         ToneAnalysis tone = service.getTone(text, null).execute();
         ElementTone etone = tone.getDocumentTone();
         List toneCategories = etone.getTones();
@@ -77,10 +85,10 @@ class ToneAnalyzerUtil extends AsyncTask<String, Integer, String>{
 
         for(Object tstemp: tones){
             ToneScore ts = (ToneScore)tstemp;
-            Emotion e=new Emotion();
-            e.emotion=ts.getName();
-            e.score=(ts.getScore());
+           //emotion.add(ts.getScore());
             //MusicPlayer.emotion.add(e);
+            MusicPlayer.emotion.emotions.add(ts.getName());
+            MusicPlayer.emotion.scores.add(ts.getScore());
             toneDisplay += ts.getName() + ": " + String.valueOf(ts.getScore()) + "\n";
         }
         return null;
@@ -92,9 +100,17 @@ class ToneAnalyzerUtil extends AsyncTask<String, Integer, String>{
         //MusicPlayer.progressBar.setVisibility(View.GONE);
        // MusicPlayer.listView.setVisibility(View.VISIBLE);
 
+        if(isFb==false)
+        {
+            new SongTbHelper().putInfo(MusicPlayer.database.getWritableDatabase(),path,MusicPlayer.emotion.scores);
+
+        }
         MusicPlayer.setActionBar();
         System.out.println("result is"+toneDisplay);
+        new SongTbHelper().putInfo(MusicPlayer.database.getWritableDatabase(),path,MusicPlayer.emotion.scores);
         MusicPlayer.progressBar.setVisibility(View.GONE);
+        MusicPlayer.start_load_message.setVisibility(View.GONE);
+
 
             // Insert to DB
 
@@ -140,7 +156,7 @@ class MusixmatchUtil extends AsyncTask<String, Integer, String>{
         //TextView text1 = (TextView) findViewById(R.id.textView);
         //text1.setText(lyricDisplay);
         if(lyricDisplay != ""){
-            new ToneAnalyzerUtil().execute(lyricDisplay, path);
+            new ToneAnalyzerUtil().execute("SONGS",lyricDisplay, path);
         }
     }
 }
@@ -205,18 +221,16 @@ class Database extends SQLiteOpenHelper
 
 class SongTbHelper
 {
-    void putInfo(SQLiteDatabase dbWrite,String path,Double score[])
+    void putInfo(SQLiteDatabase dbWrite,String path,ArrayList<Double> score)
     {
-
-
         //for(int i=0;i<emotion.length;i++)
         ContentValues values = new ContentValues();
         values.put(Schemas.SongEmotionSchema.SONG_PATH,"'"+path+"'");
-        values.put(Schemas.SongEmotionSchema.ANGER,score[0]);
-        values.put(Schemas.SongEmotionSchema.DISGUST,score[1]);
-        values.put(Schemas.SongEmotionSchema.FEAR,score[2]);
-        values.put(Schemas.SongEmotionSchema.JOY,score[3]);
-        values.put(Schemas.SongEmotionSchema.SADNESS,score[4]);
+        values.put(Schemas.SongEmotionSchema.ANGER,score.get(0));
+        values.put(Schemas.SongEmotionSchema.DISGUST,score.get(1));
+        values.put(Schemas.SongEmotionSchema.FEAR,score.get(2));
+        values.put(Schemas.SongEmotionSchema.JOY,score.get(3));
+        values.put(Schemas.SongEmotionSchema.SADNESS,score.get(4));
 
 
 
@@ -228,8 +242,9 @@ class SongTbHelper
     {
         dbWrite.delete(Schemas.SongEmotionSchema.TABLE_NAME,"WHERE COLUMN_NAME "+"LIKE ?",new String[]{"VALUEFORCOLUMN"});
     }
-    void getInfo(SQLiteDatabase dbRead)
+    ArrayList<String> getInfo(SQLiteDatabase dbRead)
     {
+        ArrayList<String> paths=new ArrayList<String>();
         System.out.print("READIG FROM DB");
         Cursor cursor=dbRead.query(Schemas.SongEmotionSchema.TABLE_NAME,
                 new String[]{Schemas.SongEmotionSchema.SONG_PATH,Schemas.SongEmotionSchema.ANGER},
@@ -240,10 +255,14 @@ class SongTbHelper
             cursor.moveToFirst();
         while(cursor!=null && cursor.moveToNext())
         {
-            System.out.println("value is "+cursor.getString(cursor.getColumnIndexOrThrow(Schemas.SongEmotionSchema.SONG_PATH)));
+            String path=cursor.getString(cursor.getColumnIndexOrThrow(Schemas.SongEmotionSchema.SONG_PATH));
+
+            paths.add(path.substring(1,path.length()-1));
+
 
         }
         System.out.print("READ DONE\n");
+        return paths;
     }
 
 

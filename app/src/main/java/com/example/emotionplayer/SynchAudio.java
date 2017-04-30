@@ -1,21 +1,28 @@
 package com.example.emotionplayer;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.app.LoaderManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.CursorLoader;
+import android.support.v7.app.AppCompatActivity;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
@@ -38,16 +45,18 @@ import java.util.Arrays;
 
 
 
-public class SynchAudio extends MusicPlayer implements View.OnClickListener {
+public class SynchAudio extends AppCompatActivity implements android.support.v4.app.LoaderManager.LoaderCallbacks {
 
-    private String classes[] = {"Class1", "Class2", "Class3"};
-    ArrayList<String> audioList;
+
+    ArrayList<String> audioList=new ArrayList<String >();
     ArrayList<String> titleList;
     ListView lv;
     ArrayAdapter<String> adapter;
     Button btn;
     View view;
     android.app.Fragment fragment;
+    ProgressBar progressBar;
+    private TextView addSongMessage;
     Fragment getFragment()
     {
         return fragment;
@@ -56,8 +65,65 @@ public class SynchAudio extends MusicPlayer implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.synch_audio);
-        audioList = syncAudioMediaStore();
+        //audioList = syncAudioMediaStore();
+        progressBar=(ProgressBar)findViewById(R.id.progress_bar);
+        //addSongMessage=(TextView)findViewById(R.id.add_song_message);
+        //addSongMessage.setVisibility(View.GONE);
+        btn = (Button) findViewById(R.id.button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SparseBooleanArray selectedItems = lv.getCheckedItemPositions();
+                ArrayList<String> selectedItemsNames = new ArrayList<String>();
+                int idx;
+                for(int i=0; i<selectedItems.size(); i++){
+                    int position = selectedItems.keyAt(i);
+                    if (selectedItems.valueAt(i)) {
+                        idx = titleList.indexOf(adapter.getItem(position));
+
+                        new MusixmatchUtil().execute(audioList.get(idx));
+                    }
+                }
+            }
+        });
+        getSupportLoaderManager().initLoader(1,null,this);
+    }
+
+    @Override
+    public android.support.v4.content.Loader onCreateLoader(int id, Bundle args) {
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
+        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
+        CursorLoader cursorLoader=new CursorLoader(this,uri,null,selection,null,sortOrder);
+
+        //progressBar.setProgress(0);
+        return cursorLoader;
+    }
+
+    @Override
+    public void onLoaderReset(android.support.v4.content.Loader loader) {
+
+    }
+
+    @Override
+    public void onLoadFinished(android.support.v4.content.Loader loader, Object data) {
+
+        Cursor cur=(Cursor)data;
+        cur.moveToFirst();
+        int count = 0;
+        if(cur != null){
+            count = cur.getCount();
+            if(count > 0) {
+                while(cur.moveToNext()){
+                    String d = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA));
+                    audioList.add(d);
+                }
+            }
+        }
+        cur.close();
+
         titleList = new ArrayList<String>();
+
         ArrayList<String> tempAudioList = new ArrayList<String>();
         MediaMetadataRetriever fileMetadata = new MediaMetadataRetriever();
         String title;
@@ -67,6 +133,7 @@ public class SynchAudio extends MusicPlayer implements View.OnClickListener {
             if(title!=null) {
                 titleList.add(title);
                 tempAudioList.add(audioList.get(i));
+         //       progressBar.setProgress(i);
             }
         }
         audioList = tempAudioList;
@@ -74,25 +141,11 @@ public class SynchAudio extends MusicPlayer implements View.OnClickListener {
         lv = (ListView)findViewById(R.id.list);
         lv.setAdapter(adapter);
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        btn = (Button) findViewById(R.id.button);
-        btn.setOnClickListener(this);
+
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
-    @Override
-    public void onClick(View v) {
-        SparseBooleanArray selectedItems = lv.getCheckedItemPositions();
-        ArrayList<String> selectedItemsNames = new ArrayList<String>();
-        int idx;
-        for(int i=0; i<selectedItems.size(); i++){
-            int position = selectedItems.keyAt(i);
-            if (selectedItems.valueAt(i)) {
-                idx = titleList.indexOf(adapter.getItem(position));
-                new MusixmatchUtil().execute(audioList.get(idx));
-            }
-        }
-    }
-
-
+    /*
     private ArrayList<String> syncAudioMediaStore(){
         ArrayList<String> audioList = new ArrayList<String>();
         ContentResolver cr = this.getContentResolver();
@@ -114,6 +167,6 @@ public class SynchAudio extends MusicPlayer implements View.OnClickListener {
         return audioList;
     }
 
-
+*/
 }
 
