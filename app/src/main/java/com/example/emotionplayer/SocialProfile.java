@@ -69,7 +69,7 @@ public class SocialProfile extends MusicPlayer {
         if(isLogin())
         {
             System.out.println("Login already\n");
-            getPosts();
+            //getPosts();
         }
         statusView=(TextView)view.findViewById(R.id.login_status_view);
         callbackmanager=(CallbackManager.Factory.create());
