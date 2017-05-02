@@ -10,9 +10,11 @@
         android:layout_height="match_parent"
 >
         <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center">
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center"
+        android:id="@+id/text_progress_id"
+            >
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -32,6 +34,28 @@
 
 
         </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:id="@+id/pie_chart_space">
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/piechart"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                />
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:id="@+id/play_icon_id"
+                android:background="@drawable/play_circle"
+
+
+                />
+        </LinearLayout>
 
     </FrameLayout>
     <ListView android:id="@+id/core_options"

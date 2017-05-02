@@ -20,6 +20,7 @@ android {
 }
 repositories {
     mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 /*
 configurations {
@@ -35,6 +36,7 @@ dependencies {
     //noinspection GradleCompatible
     compile files('libs/java-sdk-3.7.0-jar-with-dependencies.jar')
     compile files('libs/jMusixMatch-1.1.1.jar')
+    compile 'com.github.PhilJay:MPAndroidChart:v2.2.4'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.facebook.android:facebook-android-sdk:4.20.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'

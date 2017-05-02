@@ -15,25 +15,23 @@
     <string name="add_song_message">Adding song(s)</string>
 
 
-
     <string-array name="class_names">
         <item>Social Profile</item>
-        <item>Tone analyzer</item>
+        <item>Play</item>
         <item>Synch Audio</item>
-        <item>Db example</item>
+        <item>Exit</item>
 
     </string-array>
 
 
     <string-array name="fully_qualified_class_names">
         <item>com.example.emotionplayer.SOCIALPROFILE</item>
-        <item>dont touch</item>
+        <item>com.example.emotionplayer.PLAYACTIVITY</item>
         <item>com.example.emotionplayer.SYNCHAUDIO</item>
         <item>Class 3</item>
         <item>Class 4</item>
 
     </string-array>
-
 
 
 </resources>

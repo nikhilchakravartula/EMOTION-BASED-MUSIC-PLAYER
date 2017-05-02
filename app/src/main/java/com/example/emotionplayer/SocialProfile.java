@@ -13,6 +13,7 @@ import android.util.AttributeSet;
 import android.widget.Button;
 import android.view.*;
 import android.content.*;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.facebook.CallbackManager;
@@ -39,7 +40,7 @@ import java.util.logging.Level;
 import okhttp3.internal.Util;
 
 
-public class SocialProfile extends MusicPlayer {
+public class SocialProfile extends AppCompatActivity {
 
 
     LoginButton fbButton;
@@ -48,21 +49,19 @@ public class SocialProfile extends MusicPlayer {
     TextView statusView;
     private static String posts;
     View view;
-    android.app.Fragment fragment;
-    Fragment getFragment()
-    {
-        return fragment;
-    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_social_profile);
         // fragment=new SocialProfileFragment();
        //view= fragment.getView();
-        LayoutInflater inflater=(LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        view=inflater.inflate(R.layout.activity_social_profile,null,false);
-        drawerLayout.addView(view,0);
+        //LayoutInflater inflater=(LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+       // view=inflater.inflate(R.layout.activity_social_profile,null,false);
+       // drawerLayout.addView(view,0);
+      //  LinearLayout la=(LinearLayout)findViewById(R.id.pie_chart_space);
+    //    la.setVisibility(View.GONE);
       getSupportActionBar().setTitle(getIntent().getStringExtra("position"));
-        fbButton=(LoginButton)view.findViewById(R.id.fb_login_button);
+        fbButton=(LoginButton)findViewById(R.id.fb_login_button);
         fbButton.setReadPermissions(Arrays.asList("user_posts"));
        // twitterButton = (Button) view.findViewById(R.id.twitterButton);
         //twitterButton.setEnabled(false);
@@ -71,16 +70,17 @@ public class SocialProfile extends MusicPlayer {
             System.out.println("Login already\n");
             //getPosts();
         }
-        statusView=(TextView)view.findViewById(R.id.login_status_view);
+        statusView=(TextView)findViewById(R.id.login_status_view);
         callbackmanager=(CallbackManager.Factory.create());
         fbButton.registerCallback(callbackmanager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
 
                 statusView.setText("Success");
+                System.out.print("SUCCESS");
                 MusicPlayer.login=true;
                 MusicPlayer.progressBar.setVisibility(View.VISIBLE);
-                start_load_message.setVisibility(View.VISIBLE);
+                MusicPlayer.start_load_message.setVisibility(View.VISIBLE);
                 getPosts();
 
             }
@@ -129,6 +129,7 @@ public class SocialProfile extends MusicPlayer {
                         {
                            // statusView.setText("EXCEPTION"+ e.toString());
                             MusicPlayer.progressBar.setVisibility(View.GONE);
+                            MusicPlayer.text_progress_layout.setVisibility(View.GONE);
                             System.out.print("Excepton "+e.toString());
 
                         }

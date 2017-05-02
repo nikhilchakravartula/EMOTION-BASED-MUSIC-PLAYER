@@ -115,9 +115,12 @@ class ToneAnalyzerUtil extends AsyncTask<String, Integer, String>{
         }
         MusicPlayer.setActionBar();
         System.out.println("result is"+toneDisplay);
-        new SongTbHelper().putInfo(MusicPlayer.database.getWritableDatabase(),path,MusicPlayer.emotion.scores);
+        System.out.println("Setting pie chart\n");
         MusicPlayer.progressBar.setVisibility(View.GONE);
         MusicPlayer.start_load_message.setVisibility(View.GONE);
+        MusicPlayer.text_progress_layout.setVisibility(View.GONE);
+        MusicPlayer.setPieChart(0);
+
 
 
             // Insert to DB

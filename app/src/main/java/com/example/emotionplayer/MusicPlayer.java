@@ -10,6 +10,7 @@ import android.content.Intent;
 
 import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -18,11 +19,14 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.FloatRange;
 import android.support.annotation.Nullable;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.ExploreByTouchHelper;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -33,10 +37,19 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.app.*;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -73,17 +86,31 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
     private int currentTrack;
     public static android.support.v7.app.ActionBar actionBar;
     private MediaPlayer player;
+    private static PieChart pieChart;
+    static LinearLayout pie_chart_space;
+    static RelativeLayout text_progress_layout;
+    static private ArrayList<Integer> colors;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         emotion=new Emotion();
         player=new MediaPlayer();
+        colors=new ArrayList<Integer>(5);
+        colors.add(Color.BLUE);
+        colors.add(Color.GRAY);
+        colors.add(Color.RED);
+        colors.add(Color.GREEN);
+        colors.add(Color.YELLOW);
         emotion.emotions=new ArrayList<String>(5);
         emotion.scores=new ArrayList<Double>(5);
+        pie_chart_space=(LinearLayout)findViewById(R.id.pie_chart_space);
         PACKAGE_NAME=getApplicationContext().getPackageName();
         //	setListAdapter(new ArrayAdapter<String>(MusicPlayer.this,android.R.layout.simple_list_item_1,classes));
         //	setListAdapter(new ArrayAdapter<String>(MusicPlayer.this,android.R.layout.simple_list_item_1, Arrays.asList(getResources().getStringArray(R.array.class_names))));
         setContentView(R.layout.drawer_layout);
+         pieChart = (PieChart) findViewById(R.id.piechart);
+        pieChart.setUsePercentValues(false);
+        text_progress_layout=(RelativeLayout)findViewById(R.id.text_progress_id);
         classes=getResources().getStringArray(R.array.class_names);
         fullyQualifiedClassNames=getResources().getStringArray(R.array.fully_qualified_class_names);
         drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
@@ -106,7 +133,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         //dbRead=database.getReadableDatabase();
 
 
-        synchFb();
+
 
        /*setActionBar();
         progressBar.setVisibility(View.GONE);
@@ -114,6 +141,46 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         login=true;*/
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        synchFb();
+        //LinearLayout la=(LinearLayout)findViewById(R.id.pie_chart_space);
+        //la.setVisibility(View.VISIBLE);
+    }
+    static void setPieChart(int value) {
+
+        PieDataSet dataSet;
+        PieData data;
+        switch (value) {
+            case 0:
+                pieChart.setDescription("Current Mood");
+                ArrayList<Entry> yvalues = new ArrayList<Entry>();
+                ArrayList<String> xvalues = new ArrayList<String>();
+                for (int i = 0; i < 5; i++) {
+                    yvalues.add(new Entry(Float.parseFloat("" + emotion.scores.get(i)), i));
+                    xvalues.add(emotion.emotions.get(i));
+                }
+
+                dataSet = new PieDataSet(yvalues, "Emotion");
+
+                dataSet.setColors(colors);
+
+                data = new PieData(xvalues, dataSet);
+                data.setValueFormatter(new PercentFormatter());
+                data.setDrawValues(false);
+                pieChart.setData(data);
+                pieChart.setDrawSliceText(false);
+                pieChart.notifyDataSetChanged();
+                pieChart.invalidate();
+                //pie_chart_space.setVisibility(View.VISIBLE);
+                break;
+             default:
+                //pie_chart_space.setVisibility(View.GONE);
+                break;
+        }
+    }
     private void synchFb()
     {
         if(SocialProfile.isLogin())
@@ -122,6 +189,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
             Toast.makeText(getApplicationContext(),"FB integration successful",Toast.LENGTH_LONG);
             System.out.print("getting fb posts\n");
             SocialProfile.getPosts();
+
             //Toast.makeText(this,"pOSTS DONE",Toast.LENGTH_LONG);
             //System.out.print(emotion.get(0).emotion+"\t"+emotion.get(0).score+"\n");
         }
@@ -189,8 +257,8 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        Toast.makeText(this,"psotion is "+position + "and name is"+classes[position],Toast.LENGTH_LONG).show();
-        System.out.print("item click");
+     //   Toast.makeText(this,"psotion is "+position + "and name is"+classes[position],Toast.LENGTH_LONG).show();
+       // System.out.print("item click");
         if(login==false)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -215,23 +283,19 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         switch(position)
         {
             case 0:
-                //SocialProfile socialProfile=new SocialProfile();
-           /*     FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, socialProfile.getFragment())
-                        .commit();*/
-                //Toast.makeText(this,"psotion is "+socialProfile.getFragment(),Toast.LENGTH_LONG).show();
+
                loginFb(position);
-         //       synchFb();
                 break;
 
+
             case 1:
-                //new ToneAnalyzerUtil().execute("");
-                Toast.makeText(this,"here finally",Toast.LENGTH_LONG);
-                //new ToneAnalyzerUtil().execute("");
+               Intent iplay=new Intent(fullyQualifiedClassNames[position]);
+                iplay.putExtra("position",classes[position]);
+                startActivity(iplay);
                 break;
 
             case 2:
+                progressBar.setVisibility(View.VISIBLE);
                 Intent i1 =new Intent(fullyQualifiedClassNames[position]);
                 i1.putExtra("position",classes[position]);
                 startActivity(i1);
@@ -345,6 +409,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
             }
         });
     }
+
 }
 
 

@@ -15,10 +15,14 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.CursorLoader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.SparseBooleanArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -65,8 +69,15 @@ public class SynchAudio extends AppCompatActivity implements android.support.v4.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.synch_audio);
+      /*  progressBar= new ProgressBar(this);
+        progressBar.setLayoutParams(new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,
+                ActionBar.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        progressBar.setIndeterminate(true);
+        ViewGroup root=(ViewGroup)findViewById(android.R.id.content);
+        root.addView(progressBar);*/
         //audioList = syncAudioMediaStore();
         progressBar=(ProgressBar)findViewById(R.id.progress_bar);
+        progressBar.setIndeterminate(true);
         //addSongMessage=(TextView)findViewById(R.id.add_song_message);
         //addSongMessage.setVisibility(View.GONE);
         btn = (Button) findViewById(R.id.button);
@@ -91,6 +102,7 @@ public class SynchAudio extends AppCompatActivity implements android.support.v4.
 
     @Override
     public android.support.v4.content.Loader onCreateLoader(int id, Bundle args) {
+        //progressBar.setVisibility(View.VISIBLE);
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
         String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
@@ -133,16 +145,17 @@ public class SynchAudio extends AppCompatActivity implements android.support.v4.
             if(title!=null) {
                 titleList.add(title);
                 tempAudioList.add(audioList.get(i));
-         //       progressBar.setProgress(i);
+                //progressBar.setProgress(i);
             }
         }
+
         audioList = tempAudioList;
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice, titleList);
         lv = (ListView)findViewById(R.id.list);
         lv.setAdapter(adapter);
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-        progressBar.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.GONE);
     }
 
     /*
