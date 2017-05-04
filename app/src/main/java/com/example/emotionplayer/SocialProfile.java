@@ -1,6 +1,7 @@
 package com.example.emotionplayer;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.provider.BaseColumns;
 import android.support.annotation.Nullable;
@@ -49,10 +50,12 @@ public class SocialProfile extends AppCompatActivity {
     TextView statusView;
     private static String posts;
     View view;
+    AlertDialog.Builder builder;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_social_profile);
+        builder = new AlertDialog.Builder(this);
         // fragment=new SocialProfileFragment();
        //view= fragment.getView();
         //LayoutInflater inflater=(LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -76,7 +79,21 @@ public class SocialProfile extends AppCompatActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
 
-                statusView.setText("Success");
+                statusView.setText("Connected to Facebook");
+
+                builder.setMessage("Login success. See main page for your emotion chart")
+                        .setTitle("Login Alert");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
                 System.out.print("SUCCESS");
                 MusicPlayer.login=true;
                 MusicPlayer.progressBar.setVisibility(View.VISIBLE);
@@ -93,6 +110,7 @@ public class SocialProfile extends AppCompatActivity {
             @Override
             public void onError(FacebookException error) {
                 statusView.setText("Error occured "+error.toString());
+                Toast.makeText(getApplicationContext(),"Cannot connected to Facebook",Toast.LENGTH_LONG);
             }
         });
 

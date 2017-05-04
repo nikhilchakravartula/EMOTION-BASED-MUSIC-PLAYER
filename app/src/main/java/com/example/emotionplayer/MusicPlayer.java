@@ -82,10 +82,8 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
     public  static ProgressBar progressBar;
     public static TextView start_load_message;
     public static Emotion emotion;
-    private ArrayList<String> currentPlaylist;
-    private int currentTrack;
     public static android.support.v7.app.ActionBar actionBar;
-    private MediaPlayer player;
+
     private static PieChart pieChart;
     static LinearLayout pie_chart_space;
     static RelativeLayout text_progress_layout;
@@ -94,7 +92,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         emotion=new Emotion();
-        player=new MediaPlayer();
+       // player=new MediaPlayer();
         colors=new ArrayList<Integer>(5);
         colors.add(Color.BLUE);
         colors.add(Color.GRAY);
@@ -155,7 +153,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         PieData data;
         switch (value) {
             case 0:
-                pieChart.setDescription("Current Mood");
+                pieChart.setDescription("Current Mood through Facebook posts");
                 ArrayList<Entry> yvalues = new ArrayList<Entry>();
                 ArrayList<String> xvalues = new ArrayList<String>();
                 for (int i = 0; i < 5; i++) {
@@ -257,6 +255,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+        drawerLayout.closeDrawers();
      //   Toast.makeText(this,"psotion is "+position + "and name is"+classes[position],Toast.LENGTH_LONG).show();
        // System.out.print("item click");
         if(login==false)
@@ -295,21 +294,25 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                 break;
 
             case 2:
+                finish();
+                break;
+            case 3:
+
                 progressBar.setVisibility(View.VISIBLE);
                 Intent i1 =new Intent(fullyQualifiedClassNames[position]);
                 i1.putExtra("position",classes[position]);
                 startActivity(i1);
 
                 break;
-            case 3:
-                  currentTrack=0;
+                 // currentTrack=0;
                 //new SongTbHelper().putInfo(database.getWritableDatabase(),"hi this is path",new ArrayList<Double>());
-                ArrayList<PathEmotion> pathEmotions=new SongTbHelper().getInfo(database.getReadableDatabase());
-                createPlaylist(emotion,pathEmotions,3);
-                playCurrentPlaylist();
+            //    ArrayList<PathEmotion> pathEmotions=new SongTbHelper().getInfo(database.getReadableDatabase());
+              //  createPlaylist(emotion,pathEmotions,3);
+                //playCurrentPlaylist();
+            //break;
 
 
-                break;
+
         }
 
 
@@ -321,96 +324,8 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         super.onDestroy();
     }
 
-    protected void createPlaylist(Emotion e,ArrayList<PathEmotion> pathEmotions,int lengthPlaylist)
-    {
-        currentPlaylist=new ArrayList<String>();
-        class HeapNode
-        {
-            HeapNode(String p,Double d)
-            {
-                path=p;
-                value=d;
-            }
-            String path;
-            Double value;
-        }
-        PriorityQueue<HeapNode> pq=new PriorityQueue<HeapNode>(1,new Comparator<HeapNode>() {
-            @Override
-            public int compare(HeapNode o1, HeapNode o2) {
-                if(o1.value>o2.value)
-                    return 1;
-                else return 0;
-            }
-        });
-        for(PathEmotion pe:pathEmotions) {
-            Double tempValue = 0d;
-            for (Double d : e.scores) {
-                tempValue += d;
-            }
-            tempValue = Math.sqrt(tempValue);
-
-            pq.add(new HeapNode(pe.path, tempValue));
-        }
-
-     while(lengthPlaylist>0 && pq.size()>0)
-     {
-         currentPlaylist.add(pq.poll().path);
-         lengthPlaylist-=1;
-
-     }
-    }
-    private void playSong(String path)
-    {
-        try
-        {
-            player.reset();
-            System.out.println("path is "+ path);
-            player.setDataSource(new FileInputStream(path).getFD());
-            player.prepare();
-            player.start();
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-    private void playCurrentPlaylist()
-    {
-
-        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        try {
-          playSong(currentPlaylist.get(currentTrack));
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-            System.out.println("Exception occured "+ e.getStackTrace());
-        }
-
-        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                try
-                {
-                    currentTrack+=1;
-                    if(currentTrack<currentPlaylist.size()) {
-                      playSong(currentPlaylist.get(currentTrack));
-                    }
-                    else
-                    {
-                        player.stop();
-                    }
-                }
-                catch(Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-            }
-        });
-    }
-
 }
+
 
 
 

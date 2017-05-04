@@ -11,14 +11,14 @@
     <string name="drawer_close">Drawer close</string>
     <string name="facebook_app_id">386473035072887</string>
     <string name="facebook_client_token">001ce422fab91fb5033b0a3bf56a2312</string>
-    <string name="loading_fb_posts">Loading components</string>
+    <string name="loading_fb_posts">Getting facebook posts</string>
     <string name="add_song_message">Adding song(s)</string>
 
 
     <string-array name="class_names">
         <item>Social Profile</item>
         <item>Play</item>
-        <item>Synch Audio</item>
+        <!--<item>Synch Audio</item>-->
         <item>Exit</item>
 
     </string-array>
@@ -27,7 +27,7 @@
     <string-array name="fully_qualified_class_names">
         <item>com.example.emotionplayer.SOCIALPROFILE</item>
         <item>com.example.emotionplayer.PLAYACTIVITY</item>
-        <item>com.example.emotionplayer.SYNCHAUDIO</item>
+       <!-- <item>com.example.emotionplayer.SYNCHAUDIO</item>-->
         <item>Class 3</item>
         <item>Class 4</item>
 

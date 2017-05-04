@@ -110,6 +110,7 @@ class ToneAnalyzerUtil extends AsyncTask<String, Integer, String>{
 
         if(isFb==false)
         {
+
             new SongTbHelper().putInfo(MusicPlayer.database.getWritableDatabase(),path,MusicPlayer.emotion.scores);
 
         }
