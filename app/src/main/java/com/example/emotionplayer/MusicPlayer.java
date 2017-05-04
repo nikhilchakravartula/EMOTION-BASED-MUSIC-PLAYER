@@ -83,7 +83,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
     public static TextView start_load_message;
     public static Emotion emotion;
     public static android.support.v7.app.ActionBar actionBar;
-
+    static boolean isPaused;
     private static PieChart pieChart;
     static LinearLayout pie_chart_space;
     static RelativeLayout text_progress_layout;
@@ -96,6 +96,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         emotion=new Emotion();
+        isPaused=false;
        // player=new MediaPlayer();
         colors=new ArrayList<Integer>(5);
         colors.add(Color.BLUE);

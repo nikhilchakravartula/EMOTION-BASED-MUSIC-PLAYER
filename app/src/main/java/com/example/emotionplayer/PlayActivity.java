@@ -5,13 +5,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Path;
 import android.media.AudioManager;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.ListViewCompat;
 import android.util.Log;
 import android.util.MutableInt;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 
@@ -19,6 +25,7 @@ import java.io.FileInputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.zip.Inflater;
 
@@ -28,11 +35,45 @@ public class PlayActivity extends AppCompatActivity {
 
 
     private int playlistLength;
+    private ImageButton play,skip_next,skip_previous;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_layout);
+        play=(ImageButton)findViewById(R.id.play_id);
+        skip_next=(ImageButton)findViewById(R.id.skip_next_id);
+        skip_previous=(ImageButton)findViewById(R.id.skip_previous_id);
+        play.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if(MusicPlayer.isPaused==true)
+                {
+
+                }
+                else
+                {
+                    playCurrentPlaylist();
+                }
+            }
+        });
+        skip_next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MusicPlayer.currentTrack=(MusicPlayer.currentTrack+1)%playlistLength;
+                playCurrentPlaylist();
+
+
+            }
+        });
+        skip_previous.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MusicPlayer.currentTrack=(MusicPlayer.currentTrack-1+playlistLength)%playlistLength;
+                playCurrentPlaylist();
+            }
+        });
         AlertDialog.Builder builder=new AlertDialog.Builder(this);
         builder.setTitle("Title");
         builder.setMessage("message");
@@ -55,12 +96,22 @@ public class PlayActivity extends AppCompatActivity {
                 playlistLength=numberPicker.getValue();
                ArrayList<PathEmotion> pathEmotions=new SongTbHelper().getInfo(MusicPlayer.database.getReadableDatabase());
                 createPlaylist(MusicPlayer.emotion,pathEmotions,playlistLength);
+                ListView lv=(ListView)findViewById(R.id.current_playlist_id);
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(PlayActivity.this, android.R.layout.simple_list_item_1, MusicPlayer.currentPlaylist);
+                lv.setAdapter(adapter);
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    }
+                });
                 if(MusicPlayer.player==null)
                 MusicPlayer.player=new MediaPlayer();
                 else if(MusicPlayer.player.isPlaying())
                     MusicPlayer.player.stop();
                 MusicPlayer.currentTrack=0;
-                playCurrentPlaylist();
+               // playCurrentPlaylist();
             }
         });
         AlertDialog dialog=builder.create();
@@ -146,6 +197,10 @@ public class PlayActivity extends AppCompatActivity {
     {
         try
         {
+            if(MusicPlayer.player.isPlaying())
+            {
+                MusicPlayer.player.stop();
+            }
             MusicPlayer.player.reset();
             System.out.println("path is "+ path);
             MusicPlayer.player.setDataSource(new FileInputStream(path).getFD());

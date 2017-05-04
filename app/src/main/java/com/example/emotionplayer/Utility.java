@@ -112,6 +112,7 @@ class ToneAnalyzerUtil extends AsyncTask<String, Integer, String>{
         {
 
             new SongTbHelper().putInfo(MusicPlayer.database.getWritableDatabase(),path,MusicPlayer.emotion.scores);
+            SynchAudio.onComplete();
 
         }
         MusicPlayer.setActionBar();
