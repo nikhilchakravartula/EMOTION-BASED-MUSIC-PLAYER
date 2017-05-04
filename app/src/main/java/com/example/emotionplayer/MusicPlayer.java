@@ -88,6 +88,10 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
     static LinearLayout pie_chart_space;
     static RelativeLayout text_progress_layout;
     static private ArrayList<Integer> colors;
+
+    static MediaPlayer player;
+    static int currentTrack=0;
+    static ArrayList<String> currentPlaylist;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,13 +141,14 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         progressBar.setVisibility(View.GONE);
         start_load_message.setVisibility(View.GONE);
         login=true;*/
+       synchFb();
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
-        synchFb();
+        //synchFb();
         //LinearLayout la=(LinearLayout)findViewById(R.id.pie_chart_space);
         //la.setVisibility(View.VISIBLE);
     }
@@ -258,7 +263,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         drawerLayout.closeDrawers();
      //   Toast.makeText(this,"psotion is "+position + "and name is"+classes[position],Toast.LENGTH_LONG).show();
        // System.out.print("item click");
-        if(login==false)
+        if(login==false && position!=3)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("Please Login to Facebook")
@@ -293,10 +298,10 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                 startActivity(iplay);
                 break;
 
-            case 2:
+            case 3:
                 finish();
                 break;
-            case 3:
+            case 2:
 
                 progressBar.setVisibility(View.VISIBLE);
                 Intent i1 =new Intent(fullyQualifiedClassNames[position]);
@@ -306,7 +311,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                 break;
                  // currentTrack=0;
                 //new SongTbHelper().putInfo(database.getWritableDatabase(),"hi this is path",new ArrayList<Double>());
-            //    ArrayList<PathEmotion> pathEmotions=new SongTbHelper().getInfo(database.getReadableDatabase());
+            //    ArrayList<PathEmotion> pathEmotions=
               //  createPlaylist(emotion,pathEmotions,3);
                 //playCurrentPlaylist();
             //break;

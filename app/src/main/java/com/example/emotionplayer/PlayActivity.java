@@ -1,80 +1,112 @@
 package com.example.emotionplayer;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Path;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.MutableInt;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
 
 import java.io.FileInputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.zip.Inflater;
 
 public class PlayActivity extends AppCompatActivity {
 
-    private MediaPlayer player;
-    private ArrayList<String> currentPlaylist;
-    private int currentTrack;
-    static ArrayList<PathEmotion> pathEmotions;
+
+
+
+    private int playlistLength;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_layout);
-        getSupportActionBar().setTitle(getIntent().getStringExtra("position"));
-        player=new MediaPlayer();
-         currentTrack=0;
-        int index=0;
-        for(int i=0;i<5;i++)
-        {
-            if(MusicPlayer.emotion.scores.get(i)>MusicPlayer.emotion.scores.get(index))
-            {
-                index=i;
-            }
-        }
-        playSongWithId(index);
-        //new SongTbHelper().putInfo(database.getWritableDatabase(),"hi this is path",new ArrayList<Double>());
-       // pathEmotions=new ArrayList<PathEmotion>(5);
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setTitle("Title");
+        builder.setMessage("message");
+        LayoutInflater inflater=this.getLayoutInflater();
+        View view=inflater.inflate(R.layout.no_songs_picker_layout,null);
+        builder.setView(view);
+        final NumberPicker numberPicker=(NumberPicker)view.findViewById(R.id.no_fb_posts);
+        numberPicker.setMaxValue(20);
+        numberPicker.setMinValue(1);
+        numberPicker.setWrapSelectorWheel(true);
+        numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
 
-        //  createPlaylist(emotion,pathEmotions,3);
-        //playCurrentPlaylist();
+            }
+        });
+        builder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                playlistLength=numberPicker.getValue();
+               ArrayList<PathEmotion> pathEmotions=new SongTbHelper().getInfo(MusicPlayer.database.getReadableDatabase());
+                createPlaylist(MusicPlayer.emotion,pathEmotions,playlistLength);
+                if(MusicPlayer.player==null)
+                MusicPlayer.player=new MediaPlayer();
+                else if(MusicPlayer.player.isPlaying())
+                    MusicPlayer.player.stop();
+                MusicPlayer.currentTrack=0;
+                playCurrentPlaylist();
+            }
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
+        getSupportActionBar().setTitle(getIntent().getStringExtra("position"));
+
+        //new SongTbHelper().putInfo(database.getWritableDatabase(),"hi this is path",new ArrayList<Double>());
+       //
     }
 
     protected void playSongWithId(int currentmood)
     {
-        if(player.isPlaying())
+        if(MusicPlayer.player.isPlaying())
         {
-            player.stop();
+            MusicPlayer.player.stop();
         }
         switch(currentmood)
         {
             case 0:
-                player=MediaPlayer.create(this,R.raw.i_hate_everything_about_u);
+                MusicPlayer.player=MediaPlayer.create(this,R.raw.i_hate_everything_about_u);
                         break;
 
             case 1:
-                player=MediaPlayer.create(this,R.raw.life_on_mars);
+                MusicPlayer.player=MediaPlayer.create(this,R.raw.life_on_mars);
                 break;
 
             case 2:
-                player=MediaPlayer.create(this,R.raw.waterloo_sunset);
+                MusicPlayer.player=MediaPlayer.create(this,R.raw.waterloo_sunset);
                 break;
 
             case 3:
-                player=MediaPlayer.create(this,R.raw.the_beach_boys);
+                MusicPlayer.player=MediaPlayer.create(this,R.raw.the_beach_boys);
                 break;
 
             case 4:
-                player=MediaPlayer.create(this,R.raw.take_on_me);
+                MusicPlayer.player=MediaPlayer.create(this,R.raw.take_on_me);
                 break;
 
 
         }
-        player.start();
+        MusicPlayer.player.start();
 
     }
     protected void createPlaylist(Emotion e, ArrayList<PathEmotion> pathEmotions, int lengthPlaylist)
     {
-        currentPlaylist=new ArrayList<String>();
+        MusicPlayer.currentPlaylist=new ArrayList<String>();
         class HeapNode
         {
             HeapNode(String p,Double d)
@@ -105,7 +137,7 @@ public class PlayActivity extends AppCompatActivity {
 
         while(lengthPlaylist>0 && pq.size()>0)
         {
-            currentPlaylist.add(pq.poll().path);
+            MusicPlayer.currentPlaylist.add(pq.poll().path);
             lengthPlaylist-=1;
 
         }
@@ -114,11 +146,11 @@ public class PlayActivity extends AppCompatActivity {
     {
         try
         {
-            player.reset();
+            MusicPlayer.player.reset();
             System.out.println("path is "+ path);
-            player.setDataSource(new FileInputStream(path).getFD());
-            player.prepare();
-            player.start();
+            MusicPlayer.player.setDataSource(new FileInputStream(path).getFD());
+            MusicPlayer.player.prepare();
+            MusicPlayer.player.start();
         }
         catch(Exception e)
         {
@@ -127,23 +159,26 @@ public class PlayActivity extends AppCompatActivity {
     }
     private void playCurrentPlaylist() {
 
-        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        MusicPlayer.player.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
-            playSong(currentPlaylist.get(currentTrack));
+            if(MusicPlayer.currentTrack<MusicPlayer.currentPlaylist.size())
+            playSong(MusicPlayer.currentPlaylist.get(MusicPlayer.currentTrack));
+
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Exception occured " + e.getStackTrace());
         }
 
-        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+        MusicPlayer.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 try {
-                    currentTrack += 1;
-                    if (currentTrack < currentPlaylist.size()) {
-                        playSong(currentPlaylist.get(currentTrack));
+                    MusicPlayer.currentTrack += 1;
+                    if (MusicPlayer.currentTrack < MusicPlayer.currentPlaylist.size()) {
+                        playSong(MusicPlayer.currentPlaylist.get(MusicPlayer.currentTrack));
                     } else {
-                        player.stop();
+                        MusicPlayer.player.stop();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
