@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Layout;
 import android.util.AttributeSet;
+import android.util.MutableInt;
 import android.widget.Button;
 import android.view.*;
 import android.content.*;
@@ -119,7 +120,7 @@ public class SocialProfile extends AppCompatActivity {
 
     public static void getPosts(){
         new GraphRequest(
-                AccessToken.getCurrentAccessToken(), "/me/posts?since="+MusicPlayer.fb_posts_time/1000, null, HttpMethod.GET,
+                AccessToken.getCurrentAccessToken(), "/me/posts?since="+ MusicPlayer.fb_posts_time/1000, null, HttpMethod.GET,
                 new GraphRequest.Callback() {
                     public void onCompleted(GraphResponse response) {
                         posts="";

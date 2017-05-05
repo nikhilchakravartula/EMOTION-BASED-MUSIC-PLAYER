@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.lang.reflect.Array;
@@ -94,10 +95,10 @@ public class PlayActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 playlistLength=numberPicker.getValue();
+                MusicPlayer.currentPlaylist=new ArrayList<String>();
                ArrayList<PathEmotion> pathEmotions=new SongTbHelper().getInfo(MusicPlayer.database.getReadableDatabase());
                 createPlaylist(MusicPlayer.emotion,pathEmotions,playlistLength);
                 ListView lv=(ListView)findViewById(R.id.current_playlist_id);
-
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(PlayActivity.this, android.R.layout.simple_list_item_1, MusicPlayer.currentPlaylist);
                 lv.setAdapter(adapter);
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -157,6 +158,12 @@ public class PlayActivity extends AppCompatActivity {
     }
     protected void createPlaylist(Emotion e, ArrayList<PathEmotion> pathEmotions, int lengthPlaylist)
     {
+        if(e==null|| (e.scores!=null&&e.scores.isEmpty()))
+        {
+            System.out.print("Here\n");
+            Toast.makeText(this,"Can't create playlist without user emotion",Toast.LENGTH_LONG);
+            return;
+        }
         MusicPlayer.currentPlaylist=new ArrayList<String>();
         class HeapNode
         {
