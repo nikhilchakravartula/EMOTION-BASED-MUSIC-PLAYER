@@ -5,6 +5,7 @@ package com.example.emotionplayer;
  */
 
 
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 
@@ -14,6 +15,7 @@ import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.os.PersistableBundle;
@@ -24,8 +26,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.ExploreByTouchHelper;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.*;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -37,11 +38,13 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.app.*;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -52,7 +55,10 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.io.FileInputStream;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -91,7 +97,10 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
 
     static MediaPlayer player;
     static int currentTrack=0;
+    static DatePicker datePicker;
+    static TimePicker timePicker;
     static ArrayList<String> currentPlaylist;
+    static long fb_posts_time;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +113,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         colors.add(Color.RED);
         colors.add(Color.GREEN);
         colors.add(Color.YELLOW);
+
         emotion.emotions=new ArrayList<String>(5);
         emotion.scores=new ArrayList<Double>(5);
         pie_chart_space=(LinearLayout)findViewById(R.id.pie_chart_space);
@@ -132,17 +142,67 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         //toolbar=(Toolbar)findViewById(R.id.app_toolbar);
         //setSupportActionBar( (Toolbar)findViewById(R.id.app_toolbar));
         database=new Database(getApplicationContext());
-        // dbWrite=database.getWritableDatabase();
-        //dbRead=database.getReadableDatabase();
+
+
+        final AlertDialog date_dialog,time_dialog;
+
+        final View view_time=getLayoutInflater().inflate(R.layout.time_picker,null,false);
+        final AlertDialog.Builder time_builder=new AlertDialog.Builder(this);
+        time_builder.setTitle("Time").setMessage("Set Time of Fb posts");
+        time_builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                timePicker=(TimePicker) view_time.findViewById(R.id.time_picker_id);
+                //SimpleDateFormat f=new SimpleDateFormat("yyyyMMddHHmmss");
+                Calendar c = Calendar.getInstance();
+                c.set(Calendar.YEAR, datePicker.getYear());
+                c.set(Calendar.MONTH, datePicker.getMonth());
+                c.set(Calendar.DAY_OF_MONTH, datePicker.getDayOfMonth());
+                if(Build.VERSION.SDK_INT>=23) {
+                    c.set(Calendar.HOUR, timePicker.getHour());
+                    c.set(Calendar.MINUTE, timePicker.getMinute());
+                }
+                else
+                {
+                    c.set(Calendar.HOUR, timePicker.getCurrentHour());
+                    c.set(Calendar.MINUTE, timePicker.getCurrentMinute());
+                }
+                c.set(Calendar.SECOND,0);
+                c.set(Calendar.MILLISECOND, 0);
+
+                fb_posts_time=c.getTimeInMillis();
+                dialog.dismiss();
+                synchFb();
+
+            }
+        }).setView(view_time);
+        time_dialog=time_builder.create();
+
+        //time_dialog.show();
 
 
 
+        final View view=getLayoutInflater().inflate(R.layout.date_picker,null,false);
+        final AlertDialog.Builder date_builder=new AlertDialog.Builder(this);
+        date_builder.setTitle("Date").setMessage("Set Date of Fb posts");
+        date_builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
 
-       /*setActionBar();
-        progressBar.setVisibility(View.GONE);
-        start_load_message.setVisibility(View.GONE);
-        login=true;*/
-       synchFb();
+                System.out.print("Pressed cliked");
+                datePicker=(DatePicker)view.findViewById(R.id.date_picker_id);
+                System.out.print("Date picker is  "+datePicker.getYear());
+                dialog.dismiss();
+                time_dialog.show();
+
+            }
+        }).setView(view);
+        date_dialog=date_builder.create();
+        date_dialog.show();
+
+
+
     }
 
 

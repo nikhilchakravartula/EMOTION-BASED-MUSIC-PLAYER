@@ -119,13 +119,14 @@ public class SocialProfile extends AppCompatActivity {
 
     public static void getPosts(){
         new GraphRequest(
-                AccessToken.getCurrentAccessToken(), "/me/posts", null, HttpMethod.GET,
+                AccessToken.getCurrentAccessToken(), "/me/posts?since="+MusicPlayer.fb_posts_time/1000, null, HttpMethod.GET,
                 new GraphRequest.Callback() {
                     public void onCompleted(GraphResponse response) {
                         posts="";
                         try {
 
-
+                            System.out.print("timestamp is ");
+                            System.out.print("+MusicPlayer.fb_posts_time"+MusicPlayer.fb_posts_time);
                             posts="";
                             JSONObject object=response.getJSONObject();
                             JSONArray arr=object.getJSONArray("data");
@@ -138,7 +139,9 @@ public class SocialProfile extends AppCompatActivity {
                                 }
                             }
                             System.out.print("getting tone of fb posts "+posts);
+                            if(posts.length()!=0)
                             new ToneAnalyzerUtil().execute("FBPOSTS",posts);
+                            else throw new Exception();
                             //statusView.setText("Result is "+posts);
                            // System.out.println("value is" + object.get("graphObject").toString());
 

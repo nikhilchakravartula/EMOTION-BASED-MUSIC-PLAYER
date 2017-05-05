@@ -75,8 +75,8 @@ public class PlayActivity extends AppCompatActivity {
             }
         });
         AlertDialog.Builder builder=new AlertDialog.Builder(this);
-        builder.setTitle("Title");
-        builder.setMessage("message");
+        builder.setTitle("Just a sec");
+        builder.setMessage("Please specify number of songs in the playlist");
         LayoutInflater inflater=this.getLayoutInflater();
         View view=inflater.inflate(R.layout.no_songs_picker_layout,null);
         builder.setView(view);
@@ -178,8 +178,9 @@ public class PlayActivity extends AppCompatActivity {
         });
         for(PathEmotion pe:pathEmotions) {
             Double tempValue = 0d;
-            for (Double d : e.scores) {
-                tempValue += d;
+            for(int i=0;i<pe.scores.size();i++)
+            {
+                tempValue+=(Math.pow(pe.scores.get(i)-e.scores.get(i),2));
             }
             tempValue = Math.sqrt(tempValue);
 
