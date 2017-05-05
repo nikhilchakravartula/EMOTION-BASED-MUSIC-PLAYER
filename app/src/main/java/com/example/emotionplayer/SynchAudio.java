@@ -3,6 +3,7 @@ package com.example.emotionplayer;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -54,14 +55,19 @@ public class SynchAudio extends AppCompatActivity implements android.support.v4.
 
 
     ArrayList<String> audioList=new ArrayList<String >();
+    ArrayList<String> selectedList=new ArrayList<String >();
+
+
     ArrayList<String> titleList;
     ListView lv;
     ArrayAdapter<String> adapter;
     Button btn;
     View view;
     android.app.Fragment fragment;
-    ProgressBar progressBar;
+    static ProgressDialog progressDialog;
+    static int selectedItemlength=0;
     private TextView addSongMessage;
+    private static int currentUpdatingSong;
     Fragment getFragment()
     {
         return fragment;
@@ -70,6 +76,11 @@ public class SynchAudio extends AppCompatActivity implements android.support.v4.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.synch_audio);
+        progressDialog=new ProgressDialog(this);
+        progressDialog.setMessage("Synching. Please wait..");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setProgress(0);
+        progressDialog.setCancelable(false);
       /*  progressBar= new ProgressBar(this);
         progressBar.setLayoutParams(new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT,
                 ActionBar.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
@@ -77,8 +88,6 @@ public class SynchAudio extends AppCompatActivity implements android.support.v4.
         ViewGroup root=(ViewGroup)findViewById(android.R.id.content);
         root.addView(progressBar);*/
         //audioList = syncAudioMediaStore();
-        progressBar=(ProgressBar)findViewById(R.id.progress_bar);
-        progressBar.setIndeterminate(true);
         //addSongMessage=(TextView)findViewById(R.id.add_song_message);
         //addSongMessage.setVisibility(View.GONE);
         btn = (Button) findViewById(R.id.button);
@@ -88,19 +97,38 @@ public class SynchAudio extends AppCompatActivity implements android.support.v4.
                 SparseBooleanArray selectedItems = lv.getCheckedItemPositions();
                 ArrayList<String> selectedItemsNames = new ArrayList<String>();
                 int idx;
+
                 for(int i=0; i<selectedItems.size(); i++){
                     int position = selectedItems.keyAt(i);
                     if (selectedItems.valueAt(i)) {
                         idx = titleList.indexOf(adapter.getItem(position));
+                        selectedList.add(audioList.get(idx));
 
-                        new MusixmatchUtil().execute(audioList.get(idx));
                     }
+                }
+
+                selectedItemlength=selectedList.size();
+                currentUpdatingSong=0;
+                progressDialog.show();
+                for(int i=0;i<selectedItemlength;i++) {
+                    System.out.print("Sending "+i);
+                    new MusixmatchUtil().execute(selectedList.get(i));
                 }
             }
         });
         getSupportLoaderManager().initLoader(1,null,this);
     }
 
+    synchronized static void onComplete()
+    {
+    System.out.print("Received "+currentUpdatingSong);
+        currentUpdatingSong++;
+        if(selectedItemlength==currentUpdatingSong)
+        {
+            progressDialog.dismiss();
+        }
+        //progressDialog.setProgress(100* (currentUpdatingSong/selectedItemlength));
+    }
     @Override
     public android.support.v4.content.Loader onCreateLoader(int id, Bundle args) {
         //progressBar.setVisibility(View.VISIBLE);
@@ -165,7 +193,6 @@ public class SynchAudio extends AppCompatActivity implements android.support.v4.
         lv.setAdapter(adapter);
         lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-        progressBar.setVisibility(View.GONE);
     }
 
     /*
