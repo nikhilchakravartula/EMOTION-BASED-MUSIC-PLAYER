@@ -47,6 +47,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static com.example.emotionplayer.MusicPlayer.database;
 
 
 public class SynchAudio extends AppCompatActivity implements android.support.v4.app.LoaderManager.LoaderCallbacks {
@@ -123,12 +124,21 @@ public class SynchAudio extends AppCompatActivity implements android.support.v4.
         Cursor cur=(Cursor)data;
         cur.moveToFirst();
         int count = 0;
+        ArrayList<PathEmotion> pathEmotions = new SongTbHelper().getInfo(database.getReadableDatabase());
         if(cur != null){
             count = cur.getCount();
             if(count > 0) {
+                PathEmotion temp = null;
+                int i;
                 while(cur.moveToNext()){
                     String d = cur.getString(cur.getColumnIndex(MediaStore.Audio.Media.DATA));
-                    audioList.add(d);
+                    for(i=0; i<pathEmotions.size(); i++) {
+                        temp = pathEmotions.get(i);
+                        if (temp.path.equals(d))
+                            break;
+                    }
+                    if(i == pathEmotions.size())
+                        audioList.add(d);
                 }
             }
         }
