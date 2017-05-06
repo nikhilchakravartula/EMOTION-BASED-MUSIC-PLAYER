@@ -60,7 +60,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.PriorityQueue;
+import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 
@@ -156,22 +158,27 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                 timePicker=(TimePicker) view_time.findViewById(R.id.time_picker_id);
                 //SimpleDateFormat f=new SimpleDateFormat("yyyyMMddHHmmss");
                 Calendar c = Calendar.getInstance();
+
                 c.set(Calendar.YEAR, datePicker.getYear());
-                c.set(Calendar.MONTH, datePicker.getMonth());
+                c.set(Calendar.MONTH, (datePicker.getMonth()));
                 c.set(Calendar.DAY_OF_MONTH, datePicker.getDayOfMonth());
+                //System.out.print("date\t"+datePicker.getYear()+"\t"+(datePicker.getMonth()+1)+"\t"+datePicker.getDayOfMonth());
                 if(Build.VERSION.SDK_INT>=23) {
                     c.set(Calendar.HOUR, timePicker.getHour());
                     c.set(Calendar.MINUTE, timePicker.getMinute());
+                    System.out.print("time\t"+timePicker.getHour()+timePicker.getMinute());
                 }
                 else
                 {
                     c.set(Calendar.HOUR, timePicker.getCurrentHour());
                     c.set(Calendar.MINUTE, timePicker.getCurrentMinute());
+                    System.out.print("time deprecated\t"+timePicker.getCurrentHour()+timePicker.getCurrentMinute());
                 }
                 c.set(Calendar.SECOND,0);
                 c.set(Calendar.MILLISECOND, 0);
 
                 fb_posts_time=c.getTimeInMillis();
+                System.out.print("Get time in millis "+fb_posts_time);
                 dialog.dismiss();
                 synchFb();
 
