@@ -171,6 +171,9 @@ class MusixmatchUtil extends AsyncTask<String, Integer, String>{
         if(lyricDisplay != ""){
             new ToneAnalyzerUtil().execute("SONGS",lyricDisplay, path);
         }
+        else{
+            SynchAudio.onComplete();
+        }
     }
 }
 
