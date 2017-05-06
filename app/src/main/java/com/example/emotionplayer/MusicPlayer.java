@@ -54,12 +54,15 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
+import org.joda.time.DateTime;
+
 import java.io.FileInputStream;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Locale;
 import java.util.PriorityQueue;
 import java.util.TimeZone;
@@ -156,13 +159,49 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
             public void onClick(DialogInterface dialog, int which) {
 
                 timePicker=(TimePicker) view_time.findViewById(R.id.time_picker_id);
-                //SimpleDateFormat f=new SimpleDateFormat("yyyyMMddHHmmss");
-                Calendar c = Calendar.getInstance();
+                SimpleDateFormat f=new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                System.out.print("Here i am ");
+                try {
+                    Date date1=null;
+                    int month,year,day;
+                    month=(datePicker.getMonth()+1);
+                    year=(datePicker.getYear());
+                    day=(datePicker.getDayOfMonth());
+                    String tempDay="",tempMonth="";
+                    if(day<10)
+                    {
+                        tempDay="0"+day;
+                    }
+                    if(month<10)
+                    {
+                        tempMonth="0"+month;
+                    }
+                    if(Build.VERSION.SDK_INT>=23) {
+                       date1= f.parse(tempMonth + "/" + tempDay + "/" + datePicker.getYear()+" "+
+                                        timePicker.getHour()+":"+timePicker.getMinute()+":"+"00"
+                       );
+                        System.out.print("time\t"+timePicker.getHour()+timePicker.getMinute());
+                    }
+                    else
+                    {
+                        date1= f.parse(tempMonth + "/" + tempDay + "/" + datePicker.getYear()+" "+
+                                timePicker.getCurrentHour()+":"+timePicker.getCurrentMinute()+":"+"00");
+                    }
+                    System.out.print("Date is "+ date1);
+                    DateTime actualDate = new DateTime(date1);
+                    fb_posts_time=actualDate.getMillis();
+                }
+                catch (Exception e)
+                {
+                    System.out.print("Exception occured  "+e.getStackTrace());
 
-                c.set(Calendar.YEAR, datePicker.getYear());
+                }
+             /*   Calendar c = Calendar.getInstance();
+
+                c.set(Calendar.YEAR, (datePicker.getYear()));
                 c.set(Calendar.MONTH, (datePicker.getMonth()));
-                c.set(Calendar.DAY_OF_MONTH, datePicker.getDayOfMonth());
-                //System.out.print("date\t"+datePicker.getYear()+"\t"+(datePicker.getMonth()+1)+"\t"+datePicker.getDayOfMonth());
+                c.set(Calendar.DAY_OF_MONTH, (datePicker.getDayOfMonth()));
+                System.out.print("date\t"+c.YEAR+"\t"+c.MONTH+"\t"+c.DAY_OF_MONTH);
                 if(Build.VERSION.SDK_INT>=23) {
                     c.set(Calendar.HOUR, timePicker.getHour());
                     c.set(Calendar.MINUTE, timePicker.getMinute());
@@ -176,8 +215,8 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                 }
                 c.set(Calendar.SECOND,0);
                 c.set(Calendar.MILLISECOND, 0);
-
-                fb_posts_time=c.getTimeInMillis();
+*/
+                //fb_posts_time=c.getTimeInMillis();
                 System.out.print("Get time in millis "+fb_posts_time);
                 dialog.dismiss();
                 synchFb();

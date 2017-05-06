@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/EMOTION-BASED-MUSIC-PLAYER.iml" filepath="$PROJECT_DIR$/EMOTION-BASED-MUSIC-PLAYER.iml" />
       <module fileurl="file://$PROJECT_DIR$/Emotion Based Music Player.iml" filepath="$PROJECT_DIR$/Emotion Based Music Player.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
