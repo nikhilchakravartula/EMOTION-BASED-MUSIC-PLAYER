@@ -147,8 +147,13 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
         //toolbar=(Toolbar)findViewById(R.id.app_toolbar);
         //setSupportActionBar( (Toolbar)findViewById(R.id.app_toolbar));
         database=new Database(getApplicationContext());
+        showDateTime();
 
 
+    }
+
+    private void showDateTime()
+    {
         final AlertDialog date_dialog,time_dialog;
 
         final View view_time=getLayoutInflater().inflate(R.layout.time_picker,null,false);
@@ -177,9 +182,9 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                         tempMonth="0"+month;
                     }
                     if(Build.VERSION.SDK_INT>=23) {
-                       date1= f.parse(tempMonth + "/" + tempDay + "/" + datePicker.getYear()+" "+
-                                        timePicker.getHour()+":"+timePicker.getMinute()+":"+"00"
-                       );
+                        date1= f.parse(tempMonth + "/" + tempDay + "/" + datePicker.getYear()+" "+
+                                timePicker.getHour()+":"+timePicker.getMinute()+":"+"00"
+                        );
                         System.out.print("time\t"+timePicker.getHour()+timePicker.getMinute());
                     }
                     else
@@ -250,8 +255,6 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
 
 
     }
-
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -263,11 +266,14 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
 
         PieDataSet dataSet;
         PieData data;
+        pieChart.setDescription("Current Mood through Facebook posts");
+        ArrayList<Entry> yvalues;
+        ArrayList<String> xvalues ;
         switch (value) {
             case 0:
-                pieChart.setDescription("Current Mood through Facebook posts");
-                ArrayList<Entry> yvalues = new ArrayList<Entry>();
-                ArrayList<String> xvalues = new ArrayList<String>();
+
+                yvalues = new ArrayList<Entry>();
+                 xvalues = new ArrayList<String>();
                 for (int i = 0; i < 5; i++) {
                     yvalues.add(new Entry(Float.parseFloat("" + emotion.scores.get(i)), i));
                     xvalues.add(emotion.emotions.get(i));
@@ -285,6 +291,22 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                 pieChart.notifyDataSetChanged();
                 pieChart.invalidate();
                 //pie_chart_space.setVisibility(View.VISIBLE);
+                break;
+            case 1:
+                yvalues = new ArrayList<Entry>();
+                xvalues = new ArrayList<String>();
+
+                dataSet = new PieDataSet(yvalues, "Emotion");
+
+                dataSet.setColors(colors);
+
+                data = new PieData(xvalues, dataSet);
+                data.setValueFormatter(new PercentFormatter());
+                data.setDrawValues(false);
+                pieChart.setData(data);
+                pieChart.setDrawSliceText(false);
+                pieChart.notifyDataSetChanged();
+                pieChart.invalidate();
                 break;
              default:
                 //pie_chart_space.setVisibility(View.GONE);
@@ -405,7 +427,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                 startActivity(iplay);
                 break;
 
-            case 3:
+            case 4:
                 finish();
                 break;
             case 2:
@@ -415,6 +437,9 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                 i1.putExtra("position",classes[position]);
                 startActivity(i1);
 
+                break;
+            case 3:
+                showDateTime();
                 break;
                  // currentTrack=0;
                 //new SongTbHelper().putInfo(database.getWritableDatabase(),"hi this is path",new ArrayList<Double>());

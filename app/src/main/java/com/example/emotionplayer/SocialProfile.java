@@ -142,7 +142,13 @@ public class SocialProfile extends AppCompatActivity {
                             System.out.print("getting tone of fb posts "+posts);
                             if(posts.length()!=0)
                             new ToneAnalyzerUtil().execute("FBPOSTS",posts);
-                            else throw new Exception();
+                            else
+
+                            {
+                                MusicPlayer.setPieChart(1);
+                                throw new Exception();
+
+                            }
                             //statusView.setText("Result is "+posts);
                            // System.out.println("value is" + object.get("graphObject").toString());
 
