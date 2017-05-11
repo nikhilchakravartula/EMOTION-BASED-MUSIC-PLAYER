@@ -141,7 +141,7 @@ public class SocialProfile extends AppCompatActivity {
                             }
                             System.out.print("getting tone of fb posts "+posts);
                             if(posts.length()!=0)
-                            new ToneAnalyzerUtil().execute("FBPOSTS",posts);
+                            new   ToneAnalyzerUtil().execute("FBPOSTS",posts);
                             else
 
                             {

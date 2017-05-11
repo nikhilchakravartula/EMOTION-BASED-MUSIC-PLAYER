@@ -172,7 +172,7 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                     month=(datePicker.getMonth()+1);
                     year=(datePicker.getYear());
                     day=(datePicker.getDayOfMonth());
-                    String tempDay="",tempMonth="";
+                    String tempDay=""+day,tempMonth="";
                     if(day<10)
                     {
                         tempDay="0"+day;
@@ -182,15 +182,19 @@ public class MusicPlayer extends AppCompatActivity implements OnItemClickListene
                         tempMonth="0"+month;
                     }
                     if(Build.VERSION.SDK_INT>=23) {
-                        date1= f.parse(tempMonth + "/" + tempDay + "/" + datePicker.getYear()+" "+
+                        String s=(tempMonth + "/" + tempDay + "/" + datePicker.getYear()+" "+
                                 timePicker.getHour()+":"+timePicker.getMinute()+":"+"00"
                         );
+                        System.out.print("Date String is "+ s);
+                        date1= f.parse(s);
                         System.out.print("time\t"+timePicker.getHour()+timePicker.getMinute());
                     }
                     else
                     {
-                        date1= f.parse(tempMonth + "/" + tempDay + "/" + datePicker.getYear()+" "+
+                        String s=(tempMonth + "/" + tempDay + "/" + datePicker.getYear()+" "+
                                 timePicker.getCurrentHour()+":"+timePicker.getCurrentMinute()+":"+"00");
+                        System.out.print("Date String in lower api is "+ s);
+                        date1= f.parse(s);
                     }
                     System.out.print("Date is "+ date1);
                     DateTime actualDate = new DateTime(date1);
