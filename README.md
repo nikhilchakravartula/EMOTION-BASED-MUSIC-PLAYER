@@ -1,1 +1,1 @@
-This is a prototype for an Android app for emotion based music player.
+This repository contains the code for EMOTION BASED MUSIC PLAYER - IN ANDROID.
